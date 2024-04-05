@@ -36,9 +36,6 @@ $config = yii\helpers\ArrayHelper::merge(
 ArrayHelper::removeValue($config['bootstrap'], 'debug');
 unset($config['modules']['debug']);
 
-ini_set('memory_limit', -1);
-ini_set('max_execution_time', 18000);
-
 $application = new yii\console\Application($config);
 $exitCode = $application->run();
 exit($exitCode);

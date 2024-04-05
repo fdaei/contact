@@ -78,13 +78,13 @@ $this->title = "ورود به حساب کاربری";
                                 <p class="d-block text-center  text-muted" style="font-size: 12px;margin-top:8px;">
                                     <?= Html::a(
                                         '<span class="fas fa-unlock"></span> می خواهم با رمز عبور وارد شوم',
-                                        ['site/login'],
+                                        ['/site/login-password'],
                                         ['class' => 'link']
                                     ) ?>
                                     &nbsp; | &nbsp;
                                     <?= Html::a(
                                         '<span class="fas fa-user"></span> حساب کاربری ندارم',
-                                        ['site/signup'],
+                                        ['/site/register'],
                                         ['class' => 'link']
                                     ) ?>
                                 </p>

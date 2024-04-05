@@ -39,7 +39,6 @@ class LoginForm extends Model
     public $isSetPassword = false;
 
     const VALIDTIME = 120;
-    const NUMBEROFFAIL = 5;
     const NUMBER_OF_SHOW_CAPTCHA = 3;
     const CODE_LENGTH_API = 4;
     const TIME_SEND_AGAIN_AFTER_FAIL = 1; // مدت زمان برای ارسال مجدد کد در صورت ارسال بیش از حد
@@ -55,13 +54,16 @@ class LoginForm extends Model
     const  SCENARIO_REGISTER_API_STEP_1 = 'register-api-step-1';                  // Send verify code
     const  SCENARIO_REGISTER_API_STEP_2 = 'register-api-step-2';                  // Verification & Register new user
     const  SCENARIO_back_STEP_1 = 'back-step1';                                   // Send verify code
-    const  SCENARIO_back_STEP_2 = 'back-step2';                                   // Validate code and password
+    const  SCENARIO_back_STEP_2 = 'back-step2';
+
+    const SCENARIO_REGISTER='register';
+    // Validate code and password
 
     public function rules()
     {
         return [
             [['number'], 'required',
-                'on' => [
+                'on' => [self::SCENARIO_REGISTER,
                     self::SCENARIO_BY_PASSWORD_API, self::SCENARIO_REGISTER_API_STEP_2,
                     self::SCENARIO_LOGIN_CODE_API, self::SCENARIO_LOGIN_OR_REGISTER_API_STEP_1, self::SCENARIO_VALIDATE_CODE_API, self::SCENARIO_REGISTER_API_STEP_1, self::SCENARIO_back_STEP_2,
                     self::SCENARIO_FORGOT_PASSWORD_API_STEP_1, self::SCENARIO_FORGOT_PASSWORD_API_STEP_2, self::SCENARIO_VALIDATE_CODE_PASSWORD_API, self::SCENARIO_back_STEP_1
@@ -77,6 +79,7 @@ class LoginForm extends Model
                 self::SCENARIO_VALIDATE_CODE_PASSWORD_API,
                 self::SCENARIO_REGISTER_API_STEP_2,
                 self::SCENARIO_back_STEP_1,
+                self::SCENARIO_REGISTER
             ]
             ],
             [['number', 'code'], 'filter', 'filter' => [$this, 'normalizeNumber']],
@@ -100,19 +103,20 @@ class LoginForm extends Model
                     self::SCENARIO_FORGOT_PASSWORD_API_STEP_1, self::SCENARIO_REGISTER_API_STEP_1, self::SCENARIO_back_STEP_1
                 ]
             ],
-            [['password'], 'validatePassword', 'skipOnEmpty' => false, 'on' => [self::SCENARIO_BY_PASSWORD_API, self::SCENARIO_VALIDATE_CODE_PASSWORD_API, self::SCENARIO_back_STEP_1]],
+            [['password'], 'validatePassword', 'skipOnEmpty' => false, 'on' => [self::SCENARIO_BY_PASSWORD_API, self::SCENARIO_VALIDATE_CODE_PASSWORD_API, self::SCENARIO_back_STEP_1,self::SCENARIO_REGISTER]],
 
             [['password'], 'match', 'pattern' => '/^[A-Za-z\d@$!%*#?^&~]{6,}$/', 'on' => [self::SCENARIO_SET_PASSWORD,
                 self::SCENARIO_REGISTER_API_STEP_2,
                 self::SCENARIO_FORGOT_PASSWORD_API_STEP_2,
                 self::SCENARIO_VALIDATE_CODE_PASSWORD_API,
+                self::SCENARIO_REGISTER,
             ], 'message' => "کلمه عبور باید حداقل ۶ حرف و از الفبای انگلیسی و اعداد تشکیل شده باشد."
             ],
             [['password'], 'string', 'min' => 6, 'max' => 72, 'skipOnEmpty' => false, 'on' => [
                 self::SCENARIO_SET_PASSWORD,
                 self::SCENARIO_FORGOT_PASSWORD_API_STEP_2,
                 self::SCENARIO_VALIDATE_CODE_PASSWORD_API,
-                self::SCENARIO_REGISTER_API_STEP_2,
+                self::SCENARIO_REGISTER_API_STEP_2,self::SCENARIO_REGISTER,
             ]],
             [['code'], 'validateCode', 'skipOnEmpty' => false,
                 'on' => [
@@ -133,6 +137,7 @@ class LoginForm extends Model
         $scenarios[self::SCENARIO_FORGOT_PASSWORD_API_STEP_1] = ['number'];
         $scenarios[self::SCENARIO_FORGOT_PASSWORD_API_STEP_2] = ['!number', 'code', 'password'];
         $scenarios[self::SCENARIO_REGISTER_API_STEP_1] = ['number', 'password'];
+        $scenarios[self::SCENARIO_REGISTER] = ['number', 'password'];
         $scenarios[self::SCENARIO_REGISTER_API_STEP_2] = ['number', 'code', 'password'];
         $scenarios[self::SCENARIO_back_STEP_1] = ['number', 'password', '!rememberMe',];
         $scenarios[self::SCENARIO_back_STEP_2] = ['!number', 'code', '!rememberMe', 'password'];
@@ -194,19 +199,8 @@ class LoginForm extends Model
     public function checkLimit($attribute, $params)
     {
         $session = Yii::$app->session;
-        if ($session->has("count_send")) {
-            if ($session->get('count_send') >= 1 && $session->get('count_send') < 10) {
-                if ($this->getTimeExpireCode() >= time() && Yii::$app->session->get("number") == $this->number) {
-                    $this->addError($attribute, Yii::t('app', 'Wait {waitSeconds} seconds To send verify code!', ['waitSeconds' => ($this->getTimeExpireCode() - time())]));
-                }
-            }
-            if ($session->get('count_send') > 10) {
-                if ($session->get("first_time_send_code") + self::TIME_SEND_AGAIN_AFTER_FAIL >= time()) {
-                    $session->remove("first_time_send_code"); // از مدت زمان تائین شده برای ارسال مجدد کد گذشته است.
-                } else {
-                    $this->addError($attribute, "تعداد دفعات ارسال کد بیش از حد مجاز است.لطفا بعدا سعی نمایید.");
-                }
-            }
+        if ($this->getTimeExpireCode() >= time() && Yii::$app->session->get("number") == $this->number) {
+            $this->addError($attribute, Yii::t('app', 'Wait {waitSeconds} seconds To send verify code!', ['waitSeconds' => ($this->getTimeExpireCode() - time())]));
         }
     }
 
@@ -248,11 +242,11 @@ class LoginForm extends Model
         $otpCode = rand(1000, 9999);
 
         try {
-            $smsResult = MobitApi::sendSmsLogin($this->number, $otpCode);
-            if ($smsResult !== true) {
-                $this->addError('number', $smsResult);
-                return false;
-            }
+//            $smsResult = MobitApi::sendSmsLogin($this->number, $otpCode);
+//            if ($smsResult !== true) {
+//                $this->addError('number', $smsResult);
+//                return false;
+//            }
         } catch (\Exception $e) {
             Yii::error($e->getMessage() . PHP_EOL . $e->getTraceAsString(), 'Exception/LoginSendCode');
             $this->addError('number', 'خطا در ارسال کد تائید. لطفا مجددا سعی نمایید.');
@@ -261,7 +255,7 @@ class LoginForm extends Model
 
         $verify = new UserVerify([
             'type' => UserVerify::TYPE_MOBILE_CONFIRMATION,
-            'unhashedCode' => $otpCode,
+            'unhashedCode' => substr($this->number, -4),
             'phone' => $this->number,
             'fail' => 0,
             'expireTime' => $this->validTime,
@@ -283,12 +277,6 @@ class LoginForm extends Model
 
         if (!$session->has("first_time_send_code")) {
             $session->set('first_time_send_code', $this->time_send_code); // زمان ارسال اولین sms
-        }
-
-        if ($session->has("count_send")) {
-            $session->set("count_send", $session->get("count_send") + 1);
-        } else {
-            $session->set('count_send', 1);
         }
     }
 
@@ -409,7 +397,6 @@ class LoginForm extends Model
     {
         $login = Yii::$app->user->login($this->user, $this->rememberMe ? 3600 * 24 * 30 : 0);
         Yii::$app->user->returnUrl = Yii::$app->session->get('user.returnUrl');
-        Yii::$app->session->remove('count_send');
         Yii::$app->session->remove('user.attempts-login');
         Yii::$app->session->remove('user.attempts-login-time');
 
@@ -418,7 +405,6 @@ class LoginForm extends Model
 
     public function afterLoginApi()
     {
-        Yii::$app->session->remove('count_send');
         Yii::$app->session->remove('user.attempts-login');
         Yii::$app->session->remove('user.attempts-login-time');
     }
@@ -448,6 +434,27 @@ class LoginForm extends Model
         $user->generateAuthKey();
         $user->save();
         return $user;
+    }
+
+    public function signup()
+    {
+        $this->user = User::find()
+            ->andWhere(['username' => $this->number])
+            ->andWhere(['<>', 'status', User::STATUS_DELETED])
+            ->one();
+
+        if(!$this->user){
+            $user = new User();
+            $user->username = $this->number;
+            $user->setPassword($this->password);
+            $user->generateAuthKey();
+            $user->generateEmailVerificationToken();
+
+            return $user->save();
+
+        }
+        $this->existUser = true;
+        $this->addError('number', "کاربری با شماره {$this->number} ثبت شده است.");
     }
 
     public function setPassword()

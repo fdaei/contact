@@ -1,4 +1,0 @@
-FROM registry.ops.mobit.ir/avinox/backend:latest as avinox
-
-FROM registry.ops.mobit.ir/base/nginx:latest
-COPY --from=avinox /app /app

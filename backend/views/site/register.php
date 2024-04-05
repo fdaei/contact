@@ -1,17 +1,20 @@
 <?php
 
-use common\widgets\ClockWidget;
+use yii\web\View;
+use common\models\LoginForm;
+use yii\authclient\widgets\AuthChoice;
 use yii\bootstrap4\ActiveForm;
-use yii\bootstrap4\Alert;
 use yii\helpers\Html;
 use yii\helpers\Url;
-use yii\widgets\Pjax;
 use yii\captcha\Captcha;
+use yii\widgets\Pjax;
 
-/** @var $model \common\models\LoginForm */
-/** @var $type string */
+/* @var $this View */
+/* @var $form ActiveForm */
+/* @var $model LoginForm */
+/* @var $alert string */
 
-$this->title = 'تایید کد';
+$this->title = "ورود به حساب کاربری";
 ?>
 <div class="content" style="margin-top: 17%">
     <div class="mt-5">
@@ -31,59 +34,71 @@ $this->title = 'تایید کد';
                         <div class="card m-5">
                             <?php
                             $form = ActiveForm::begin([
-                                'id' => 'verify-form',
+                                'id' => 'login-form',
+                                'options' => [
+                                    'data-pjax' => true,
+                                ],
+                                'action' => Url::to(['/site/register']),
                                 'fieldConfig' => [
                                     'options' => [
                                         'tag' => 'span',
                                     ],
                                 ],
-                                'options' => [
-                                    'data-pjax' => true,
-                                ],
-                                'action' => Url::to(['/site/verify-code']),
                             ]);
                             ?>
 
-                            <?= $form->field($model, 'code',
+                            <?= $form->field($model, 'number',
                                 [
                                     'template' => "<div class='input-group mb-3'>
-                                            <div class='input-group-append'>
-                                                <span class='input-group-text' id='basic-addon2'>
-                                                    <i class='far fa-sms font-20'></i>
-                                                </span>
-                                            </div>{input}\n{label}\n{hint}\n{error}
-                                       </div>",
+                                                <div class='input-group-append'>
+                                                    <span class='input-group-text' id='basic-addon2'>
+                                                        <i class='far fa-mobile-alt'></i>
+                                                    </span>
+                                                </div>{input}\n{label}\n{hint}\n{error}
+                                           </div>",
                                     'inputOptions' => [
                                         'autofocus' => 'autofocus',
                                         'autocomplete' => 'off',
-                                        'class' => 'form-control form-control-lg text-center',
+                                        'class' => 'form-control form-control-lg text-center persian-to-english',
                                         'tabindex' => '1',
                                         'aria-describedby' => 'basic-addon1',
-                                        'placeholder' => Yii::t('app', 'کد تایید را وارد کنید'),
-                                        'maxlength' => 6,
+                                        'placeholder' => 'شماره تلفن همراه خود را وارد کنید',
                                         'inputmode' => 'numeric',
                                         'pattern' => "[0-9]*",
                                     ]
                                 ]
-                            )->label(false);
-                            ?>
+                            )->label(false); ?>
+                            <?= $form->field($model, 'password',
+                                [
+                                    'template' => "<div class='input-group mb-3'>
+                                                <div class='input-group-append'>
+                                                    <span class='input-group-text' id='basic-addon2'>
+                                                        <i class='far fa-lock'></i>
+                                                    </span>
+                                                </div>{input}\n{label}\n{hint}\n{error}
+                                           </div>",
+                                    'inputOptions' => [
+                                        'class' => 'form-control form-control-lg text-center persian-to-english',
+                                    ]
+                                ]
+                            )->passwordInput()->label(false); ?>
                             <div class="form-group text-center">
                                 <div class="col-xs-12 pb-3">
                                     <?= Html::submitButton(
-                                        'ورود به حساب کاربری',
+                                        'ثبت نام',
                                         ['class' => 'btn btn-block btn-lg btn-primary', 'name' => 'login-button']
                                     ) ?>
                                 </div>
                                 <p class="d-block text-center  text-muted" style="font-size: 12px;margin-top:8px;">
                                     <?= Html::a(
                                         '<span class="fas fa-unlock"></span> می خواهم با رمز عبور وارد شوم',
-                                        ['site/login'],
+                                        ['/site/login-password'],
                                         ['class' => 'link']
                                     ) ?>
                                     &nbsp; | &nbsp;
                                     <?= Html::a(
-                                        '<span class="fas fa-user"></span> حساب کاربری ندارم',
-                                        ['site/signup'],
+                                        '<span class="fas fa-user"></span> ورود به حساب کاربری ',
+                                        ['/site/login'],
                                         ['class' => 'link']
                                     ) ?>
                                 </p>

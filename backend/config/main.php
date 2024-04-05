@@ -86,9 +86,9 @@ return [
         ],
         'assetManager' => [
             'appendTimestamp' => true,
-            'hashCallback' => function ($path) {
-                return str_replace([Yii::getAlias('@vendor/'), Yii::getAlias('@backend/'), Yii::getAlias('@common/')], '', $path);
-            },
+//            'hashCallback' => function ($path) {
+         //       return str_replace([Yii::getAlias('@vendor/'), Yii::getAlias('@backend/'), Yii::getAlias('@common/')], '', $path);
+            //},
             'assetMap' => [
                 'yii2-dynamic-form.js' => '@web/js/yii2-dynamic-form.min.js',
                 'yii2-dynamic-form.min.js' => '@web/js/yii2-dynamic-form.min.js',

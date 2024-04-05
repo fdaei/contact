@@ -69,8 +69,8 @@ return [
             ],
         ],
         'session' => [
-            'class' => 'yii\redis\Session',
-            //'class' => 'yii\web\Session',
+//            'class' => 'yii\redis\Session',
+            'class' => 'yii\web\Session',
         ],
         'formatter' => [
             'locale' => 'fa_IR@c\alendar=persian',
@@ -81,10 +81,10 @@ return [
             'currencyCode' => 'IRR',
             'numberFormatterSymbols' => [8 => ' '],
         ],
-        'cache' => [
-            'class' => 'yii\redis\Cache',
-            //'class' => 'yii\caching\FileCache',
-        ],
+//        'cache' => [
+////            'class' => 'yii\redis\Cache',
+//            'class' => 'yii\caching\FileCache',
+//        ],
         'pdate' => [
             'class' => 'common\components\Pdate'
         ],
@@ -95,6 +95,4 @@ return [
             'class' => 'common\components\Cdn',
         ],
     ],
-
-
 ];
