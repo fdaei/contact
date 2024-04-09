@@ -13,7 +13,7 @@ class m240407_165307_create_legal_contact extends Migration
     public function safeUp()
     {
         $this->createTable('{{%legal_contact}}', [
-            'id' => $this->primaryKey(),
+            'id' => $this->primaryKey()->unsigned(),
             'logo' => $this->string()->null(),
             'name' => $this->string()->notNull(),
             'national_id' => $this->string()->notNull(),
@@ -49,6 +49,6 @@ class m240407_165307_create_legal_contact extends Migration
      */
     public function safeDown()
     {
-        $this->dropTable('{{%legal_entities}}');
+        $this->dropTable('{{%legal_contact}}');
     }
 }

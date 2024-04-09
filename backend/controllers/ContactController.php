@@ -1,17 +1,21 @@
 <?php
 
-namespace backend\models;
+namespace backend\controllers;
 
+use common\models\ContactSearch;
+use common\models\LegalContact;
 use common\models\RealContact;
 use common\models\RealContactSearch;
+use Yii;
+use yii\data\ArrayDataProvider;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
 /**
- * RealContactController implements the CRUD actions for RealContact model.
+ * ContactController implements the CRUD actions for RealContact model.
  */
-class RealContactController extends Controller
+class ContactController extends Controller
 {
     /**
      * @inheritDoc
@@ -38,14 +42,28 @@ class RealContactController extends Controller
      */
     public function actionIndex()
     {
-        $searchModel = new RealContactSearch();
-        $dataProvider = $searchModel->search($this->request->queryParams);
+        $LegalContact = LegalContact::find()->asArray()->all();
+        $RealContact  = RealContact::find()->asArray()->all();
+
+        $contacts = array_merge_recursive($LegalContact, $RealContact);
+
+        $dataProvider = new ArrayDataProvider([
+            'allModels' => $contacts,
+            'pagination' => [
+                'pageSize' => 10,
+            ],
+            'sort' => [
+                'attributes' => ['created_at'],
+            ],
+        ]);
 
         return $this->render('index', [
-            'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
         ]);
     }
+
+
+
 
     /**
      * Displays a single RealContact model.
