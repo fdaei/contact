@@ -2,7 +2,12 @@
 
 namespace common\models;
 
+use common\behaviors\CdnUploadImageBehavior;
+use sadi01\moresettings\behaviors\UploadImageBehavior;
 use Yii;
+use yii\behaviors\BlameableBehavior;
+use yii\behaviors\TimestampBehavior;
+use yii2tech\ar\softdelete\SoftDeleteBehavior;
 
 /**
  * This is the model class for table "legal_contact".
@@ -38,12 +43,15 @@ use Yii;
  */
 class LegalContact extends \yii\db\ActiveRecord
 {
+    const STATUS_ACTIVE = 1;
+    const STATUS_DELETED = 0;
+    const STATUS_INACTIVE = 2;
     /**
      * {@inheritdoc}
      */
     public static function tableName()
     {
-        return 'legal_contact';
+        return '{{%legal_contact}}';
     }
 
     /**
@@ -97,6 +105,71 @@ class LegalContact extends \yii\db\ActiveRecord
         ];
     }
 
+    public static function itemAlias($type, $code = NULL)
+    {
+        $_items = [
+            'Status' => [
+                self::STATUS_DELETED => Yii::t('app', 'DELETED'),
+                self::STATUS_ACTIVE => Yii::t('app', 'ACTIVE'),
+                self::STATUS_INACTIVE => Yii::t('app', 'INACTIVE'),
+            ],
+            'StatusClass' => [
+                self::STATUS_DELETED => 'danger',
+                self::STATUS_ACTIVE => 'success',
+                self::STATUS_INACTIVE => 'warning',
+            ],
+            'StatusColor' => [
+                self::STATUS_DELETED => '#ff5050',
+                self::STATUS_ACTIVE => '#04AA6D',
+                self::STATUS_INACTIVE => '#eea236',
+            ],
+        ];
+        if (isset($code))
+            return isset($_items[$type][$code]) ? $_items[$type][$code] : false;
+        else
+            return isset($_items[$type]) ? $_items[$type] : false;
+    }
+
+    public function behaviors()
+    {
+        return [
+            'timestamp' => [
+                'class' => TimestampBehavior::class
+            ],
+            [
+                'class' => BlameableBehavior::class,
+                'createdByAttribute' => 'created_by',
+                'updatedByAttribute' => 'updated_by',
+            ],
+            'softDeleteBehavior' => [
+                'class' => SoftDeleteBehavior::class,
+                'softDeleteAttributeValues' => [
+                    'deleted_at' => time(),
+                    'status' => self::STATUS_DELETED
+                ],
+                'restoreAttributeValues' => [
+                    'deleted_at' => 0,
+                    'status' => self::STATUS_ACTIVE
+                ],
+                'replaceRegularDelete' => false, // mutate native `delete()` method
+                'invokeDeleteEvents' => false
+            ],
+//            [
+//                'class' => UploadImageBehavior::class,
+//                'attribute' => 'logo',
+//                'scenarios' => [self::SCENARIO_DEFAULT],
+//                'instanceByName' => false,
+//                //'placeholder' => "/assets/images/default.jpg",
+//                'deleteBasePathOnDelete' => false,
+//                'createThumbsOnSave' => false,
+//                'transferToCDN' => false,
+//                'cdnPath' => "@cdnRoot/legalContact",
+//                'basePath' => "@inceRoot/legalContact",
+//                'path' => "@inceRoot/legalContact",
+//                'url' => "@cdnWeb/legalContact"
+//            ],
+        ];
+    }
     /**
      * {@inheritdoc}
      * @return LegalContactQuery the active query used by this AR class.

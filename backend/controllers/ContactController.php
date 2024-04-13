@@ -42,10 +42,25 @@ class ContactController extends Controller
      */
     public function actionIndex()
     {
-        $LegalContact = LegalContact::find()->asArray()->all();
-        $RealContact  = RealContact::find()->asArray()->all();
+        $legalContacts = LegalContact::find()
+            ->select(['id','name', 'registration_city_id as city','national_id','economic_code','coin','registration_date','status', 'registration_province_id as province', 'registration_address as address'])
+            ->asArray()
+            ->all();
 
-        $contacts = array_merge_recursive($LegalContact, $RealContact);
+        $realContacts = RealContact::find()
+            ->select(['id','last_name as name', 'birth_city_id as city','national_id','coin','registration_date','status', 'birth_province_id as province', 'birth_address as address'])
+            ->asArray()
+            ->all();
+        foreach ($legalContacts as &$contact) {
+            $contact['contact_type'] = 'Legal';
+        }
+
+
+        foreach ($realContacts as &$contact) {
+            $contact['contact_type'] = 'Real';
+        }
+
+        $contacts = array_merge($legalContacts, $realContacts);
 
         $dataProvider = new ArrayDataProvider([
             'allModels' => $contacts,
@@ -53,100 +68,12 @@ class ContactController extends Controller
                 'pageSize' => 10,
             ],
             'sort' => [
-                'attributes' => ['created_at'],
+                'attributes' => ['name', 'city', 'province', 'address'],
             ],
         ]);
 
         return $this->render('index', [
             'dataProvider' => $dataProvider,
         ]);
-    }
-
-
-
-
-    /**
-     * Displays a single RealContact model.
-     * @param int $id شناسه
-     * @return string
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    public function actionView($id)
-    {
-        return $this->render('view', [
-            'model' => $this->findModel($id),
-        ]);
-    }
-
-    /**
-     * Creates a new RealContact model.
-     * If creation is successful, the browser will be redirected to the 'view' page.
-     * @return string|\yii\web\Response
-     */
-    public function actionCreate()
-    {
-        $model = new RealContact();
-
-        if ($this->request->isPost) {
-            if ($model->load($this->request->post()) && $model->save()) {
-                return $this->redirect(['view', 'id' => $model->id]);
-            }
-        } else {
-            $model->loadDefaultValues();
-        }
-
-        return $this->render('create', [
-            'model' => $model,
-        ]);
-    }
-
-    /**
-     * Updates an existing RealContact model.
-     * If update is successful, the browser will be redirected to the 'view' page.
-     * @param int $id شناسه
-     * @return string|\yii\web\Response
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    public function actionUpdate($id)
-    {
-        $model = $this->findModel($id);
-
-        if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
-        }
-
-        return $this->render('update', [
-            'model' => $model,
-        ]);
-    }
-
-    /**
-     * Deletes an existing RealContact model.
-     * If deletion is successful, the browser will be redirected to the 'index' page.
-     * @param int $id شناسه
-     * @return \yii\web\Response
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    public function actionDelete($id)
-    {
-        $this->findModel($id)->delete();
-
-        return $this->redirect(['index']);
-    }
-
-    /**
-     * Finds the RealContact model based on its primary key value.
-     * If the model is not found, a 404 HTTP exception will be thrown.
-     * @param int $id شناسه
-     * @return RealContact the loaded model
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    protected function findModel($id)
-    {
-        if (($model = RealContact::findOne(['id' => $id])) !== null) {
-            return $model;
-        }
-
-        throw new NotFoundHttpException(Yii::t('app', 'The requested page does not exist.'));
     }
 }
