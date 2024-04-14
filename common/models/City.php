@@ -45,7 +45,6 @@ class City extends \yii\db\ActiveRecord
             [['province_id', 'name'], 'required'],
             [['province_id'], 'integer'],
             [['name'], 'string', 'max' => 128],
-            [['name', 'province_id', 'deleted_at'], 'unique'],
             [['created_by'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['created_by' => 'id']],
             [['updated_by'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['updated_by' => 'id']],
             [['province_id'], 'exist', 'skipOnError' => true, 'targetClass' => Province::class, 'targetAttribute' => ['province_id' => 'id']],

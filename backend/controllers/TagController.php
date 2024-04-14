@@ -75,12 +75,10 @@ class TagController extends Controller
     public function actionCreate()
     {
         $model = new Tag();
-
         if ($model->load(Yii::$app->request->post()) && $model->validate()) {
             $transaction = Yii::$app->db->beginTransaction();
             try {
-                $flag = $model->save(false);
-                if ($flag) {
+                if ($model->save(false)) {
                     $transaction->commit();
                     Yii::$app->response->format = Response::FORMAT_JSON;
 

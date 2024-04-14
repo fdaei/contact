@@ -8,7 +8,7 @@ $menu_items = [
         'group' => 'Dashboard',
         'label' => 'داشبورد ',
         'icon' => 'fas fa-tachometer-alt', // ایکون داشبورد
-        'url' => ['/dashboard']
+        'url' => ['/']
     ],
     [
         'group' => 'Secretariat',
@@ -21,7 +21,7 @@ $menu_items = [
                 'group' => 'contact',
                 'label' => 'مخاطبین',
                 'icon' => 'fas fa-address-book', // ایکون مخاطبین
-                'url' => ['/city/']
+                'url' => ['/contact/index']
             ],
             [
                 'group' => 'archive',
@@ -60,9 +60,30 @@ $menu_items = [
     ],
     [
         'group' => 'base',
-        'label' => 'اطلاعات پایه ',
-        'icon' => 'fas fa-database', // ایکون اطلاعات پایه
-        'url' => ['/dashboard']
+        'label' => ' اطلاعات پایه',
+        'icon' => 'fas fa-database',
+        'level' => "first-level",
+        'encode' => false,
+        'items' => [
+            [
+                'group' => 'city',
+                'label' => 'شهر ها',
+                'icon' => 'fas fa-address-book',
+                'url' => ['/city/index']
+            ],
+            [
+                'group' => 'province',
+                'label' => 'استان ها  ',
+                'icon' => 'fas fa-archive',
+                'url' => ['/province/index']
+            ],
+            [
+                'group' => 'tag',
+                'label' => 'تگ ها',
+                'icon' => 'fas fa-mail-bulk',
+                'url' => ['/tag/index']
+            ]
+        ]
     ],
     [
         'group' => 'setting',

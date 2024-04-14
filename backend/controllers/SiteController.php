@@ -153,7 +153,7 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
-
+        return $this->render('index');
     }
 
 
@@ -162,7 +162,7 @@ class SiteController extends Controller
         $model = new ChangePassword();
         if ($model->load(Yii::$app->request->post()) && $model->change()) {
             Yii::$app->session->setFlash('success', 'کلمه عبور با موفقیت تغییر کرد');
-            return $this->redirect(['profile/index']);
+            return $this->redirect(['/']);
         }
         return $this->render('change_password', [
             'model' => $model
@@ -207,7 +207,7 @@ class SiteController extends Controller
         $this->layout = 'login';
         $model = new LoginForm(['scenario' => LoginForm::SCENARIO_back_STEP_1]);
         if ($model->load(Yii::$app->request->post()) && $model->login()) {
-            return $this->redirect(['profile/index']);
+            return $this->redirect(['/']);
         }
         return $this->render('login_password', [
             'model' => $model,
@@ -268,7 +268,7 @@ class SiteController extends Controller
         $this->layout = 'login';
         $model = new LoginForm(['scenario' => LoginForm::SCENARIO_REGISTER]);
         if ($model->load(Yii::$app->request->post()) && $model->signup()) {
-            return $this->redirect(['profile/index']);
+            return $this->redirect(['/']);
         }
         return $this->render('register', [
             'model' => $model,

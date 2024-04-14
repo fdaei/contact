@@ -33,7 +33,7 @@ class Tag extends ActiveRecord
 
     public static function tableName()
     {
-        return '{{' . CoreHelper::getDsnAttribute('dbname', Yii::$app->db->dsn) . '}}.{{%tags}}';
+        return '{{%tags}}';
     }
 
     public function rules()
