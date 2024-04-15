@@ -29,6 +29,7 @@ use yii\widgets\ActiveForm;
 /** @var common\models\ShabaNumbers $shabaNumbers */
 /** @var common\models\SocialLink $socialLink */
 /** @var common\models\Websites $websites */
+/** @var common\models\RealContactFile $uploadFile */
 
 ?>
 
@@ -44,7 +45,7 @@ use yii\widgets\ActiveForm;
             <?= $form->field($model, 'last_name')->textInput(['maxlength' => true]) ?>
         </div>
         <div class='col-md-3'>
-            <?= $form->field($model, 'national_id')->textInput(['maxlength' => true]) ?>
+            <?= $form->field($model, 'national_code')->textInput(['maxlength' => true]) ?>
         </div>
         <div class='col-md-3'>
             <?= $form->field($model, 'coin')->input('number') ?>
@@ -696,7 +697,66 @@ use yii\widgets\ActiveForm;
                 </div>
             </div>
         </div>
-        <div class='col-md-4'>
+        <div class='col-md-6'>
+            <div class="businesses-story-form">
+                <div class="row">
+                    <div class="card card-body">
+                        <?php
+                        DynamicFormWidget::begin([
+                            'widgetContainer' => 'dynamicform_wrapper11',
+                            'widgetBody' => '.container-items',
+                            'widgetItem' => '.item-websites',
+                            'limit' => 20,
+                            'min' => 1,
+                            'insertButton' => '.add-item-websites',
+                            'deleteButton' => '.remove-item-websites',
+                            'model' => $uploadFile[0],
+                            'formId' => 'dynamic-form',
+                            'formFields' => [
+                                'file_name',
+                                'file_path'
+                            ],
+                        ]); ?>
+                        <div class="container-items">
+                            <div>
+                                <button type="button" class="add-item-websites btn  btn-xs float-right  bg-primary text-white">
+                                    فایل جدید
+                                </button>
+                            </div>
+                            <?php foreach ($uploadFile as $i => $file): ?>
+                                <div class="item-websites panel panel-default" style="padding-right: 0px">
+                                    <div class="panel-body">
+                                        <?php
+                                        if (!$file->isNewRecord) {
+                                            echo Html::activeHiddenInput($file, "[{$i}]id");
+                                        }
+                                        ?>
+                                        <div class="row">
+                                            <div class="col-sm-12">
+                                                <?= $form->field($file, "[{$i}]file_name")->textInput(['maxlength' => true]) ?>
+                                            </div>
+                                            <div class="col-sm-12">
+                                                <?= $form->field($file, "[{$i}]file_path")->fileInput() ?>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="">
+                                        <div class="">
+                                            <button type="button" class="remove-item-websites btn  btn-xs float-right  btn-danger text-white">
+                                                حذف فایل
+                                            </button>
+                                        </div>
+                                        <div class="clearfix"></div>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                        <?php DynamicFormWidget::end(); ?>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class='col-md-6'>
 
             <?= $form->field($model, 'contact_tag')->widget(Select2::class, [
                 'initValueText' => $model->isNewRecord ? $tagSelected : ArrayHelper::map($searchedTags, 'tag_id', 'name'),
@@ -735,10 +795,10 @@ use yii\widgets\ActiveForm;
                 ]
             ]); ?>
         </div>
-        <div class='col-md-3 mt-5'>
+        <div class='col-md-6 mt-5'>
             <?= $form->field($model, 'status')->dropDownList(RealContact::itemAlias('Status'), ['prompt' => Yii::t('app', 'Select Status')]) ?>
         </div>
-        <div class="col-md-9 text-center">
+        <div class="col-md-6 text-center">
             <?= $form->field($model, 'image')->widget(FileInput::class, [
                 'name' => 'attachment_3',
                 'options' => ['accept' => 'image/*'],
@@ -746,7 +806,7 @@ use yii\widgets\ActiveForm;
         </div>
     </div>
     <div class="form-group mb-0 card-footer d-flex justify-content-between">
-        <div class="col-md-10 d-flex justify-content-end">
+        <div>
             <button type="submit" class="btn btn-primary">ثبت</button>
         </div>
     </div>

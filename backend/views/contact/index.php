@@ -2,10 +2,10 @@
 
 use common\models\LegalContact;
 use common\models\RealContact;
-use yii\helpers\Html;
-use yii\widgets\Pjax;
 use common\widgets\grid\ActionColumn;
 use common\widgets\grid\GridView;
+use yii\helpers\Html;
+use yii\widgets\Pjax;
 
 $this->title = Yii::t('app', 'Contacts');
 $this->params['breadcrumbs'][] = $this->title;
@@ -14,7 +14,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <h2><?= Html::encode($this->title) ?></h2>
 
-    <div class="text-right">
+    <div class="text-right my-3">
         <?= Html::a(Yii::t('app', 'Create Contact'), ['/real-contact/create'], ['class' => 'btn btn-success text-left']) ?>
     </div>
 
@@ -41,8 +41,8 @@ $this->params['breadcrumbs'][] = $this->title;
                 'label' => Yii::t('app', 'Contact Type'),
             ],
             [
-                'attribute' => 'national_id',
-                'label' => Yii::t('app', 'National ID'),
+                'attribute' => 'national_code',
+                'label' => Yii::t('app', 'National Code'),
             ],
             [
                 'attribute' => 'economic_code',
@@ -55,10 +55,16 @@ $this->params['breadcrumbs'][] = $this->title;
             [
                 'attribute' => 'city',
                 'label' => Yii::t('app', 'City'),
+                'value'=>function($model){
+                    return \common\models\City::findOne($model['city'])->name;
+                }
             ],
             [
                 'attribute' => 'province',
                 'label' => Yii::t('app', 'Province'),
+                'value'=>function($model){
+                    return \common\models\Province::findOne($model['province'])->name;
+                }
             ],
             [
                 'attribute' => 'address',

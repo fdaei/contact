@@ -2,6 +2,7 @@
 
 namespace backend\controllers;
 
+use common\models\Model;
 use common\models\Addresses;
 use common\models\BankAccounts;
 use common\models\Cards;
@@ -10,12 +11,14 @@ use common\models\FaxNumbers;
 use common\models\MobileNumber;
 use common\models\PhoneNumbers;
 use common\models\RealContact;
+use common\models\RealContactFile;
 use common\models\RealContactSearch;
 use common\models\ShabaNumbers;
 use common\models\SocialLink;
 use common\models\Tag;
 use common\models\Websites;
 use Yii;
+use yii\db\Exception;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -90,15 +93,92 @@ class RealContactController extends Controller
         $shabaNumbers = [new ShabaNumbers()];
         $socialLink = [new SocialLink()];
         $websites = [new Websites()];
+        $uploadFiles = [new RealContactFile()];
         $searchedTags = Tag::find()->andWhere(['in', 'tag_id', $model->tagNames])->asArray()->all();
         $tagSelected = [];
-        if ($model->load(Yii::$app->request->post())) {
 
-            $model->event_tag = Yii::$app->request->post('Event')['event_tag'];
-            $tagSelected = Yii::$app->request->post('Event')['event_tag'];
+        if ($model->load(Yii::$app->request->post())) {
+            $model->contact_tag = Yii::$app->request->post('RealContact')['contact_tag'];
+            $tagSelected = Yii::$app->request->post('RealContact')['contact_tag'];
             $searchedTags = Tag::find()->select(['tag_id', 'name'])->andWhere(['in', 'tag_id', $tagSelected])->asArray()->all();
             $Tag=new Tag();
             $tagSelected = $Tag->makeArrayOfTagId($tagSelected,$searchedTags);
+
+            $mobileNumbersData = Yii::$app->request->post('MobileNumber', []);
+            $mobileNumbers = MobileNumber::handelData($mobileNumbersData);
+            $model->mobile_numbers = json_encode($mobileNumbers); // save as json
+
+            $faxNumbersData = Yii::$app->request->post('FaxNumbers', []);
+            $faxNumbers = FaxNumbers::handelData($faxNumbersData);
+            $model->fax_numbers = json_encode($faxNumbers); // save as json
+
+
+            $phoneNumbersData = Yii::$app->request->post('PhoneNumbers', []);
+            $phoneNumbers = PhoneNumbers::handelData($phoneNumbersData);
+            $model->phone_numbers = json_encode($phoneNumbers); // save as json
+
+
+            $addressesData = Yii::$app->request->post('Addresses', []);
+            $addresses = Addresses::handelData($addressesData);
+            $model->addresses = json_encode($addresses); // save as json
+
+
+            $bankAccountsData = Yii::$app->request->post('BankAccounts', []);
+            $bankAccounts = BankAccounts::handelData($bankAccountsData);
+            $model->bank_accounts = json_encode($bankAccounts); // save as json
+
+
+            $cardsData = Yii::$app->request->post('Cards', []);
+            $cards = Cards::handelData($cardsData);
+            $model->cards = json_encode($cards); // save as json
+
+
+            $emailsData = Yii::$app->request->post('Emails', []);
+            $emails = Emails::handelData($emailsData);
+            $model->emails = json_encode($emails); // save as json
+
+
+            $shabaNumbersData = Yii::$app->request->post('ShabaNumbers', []);
+            $shabaNumbers = ShabaNumbers::handelData($shabaNumbersData);
+            $model->shaba_numbers = json_encode($shabaNumbers); // save as json
+
+
+            $socialLinkData = Yii::$app->request->post('SocialLink', []);
+            $socialLink = SocialLink::handelData($socialLinkData);
+            $model->social_links = json_encode($socialLink); // save as json
+
+
+            $websitesData = Yii::$app->request->post('Websites', []);
+            $websites = Websites::handelData($websitesData);
+            $model->websites = json_encode($websites); // save as json
+
+            $uploadFiles = Model::createMultiple(RealContactFile::classname());
+            Model::loadMultiple($uploadFiles, Yii::$app->request->post());
+
+
+            $valid = $model->validate();
+//            $valid = Model::validateMultiple($uploadFiles) && $valid;
+
+//            if ($valid) {
+                $transaction = \Yii::$app->db->beginTransaction();
+                try {
+                    if ($flag = $model->save(false)) {
+                        foreach ($uploadFiles as $uploadFile) {
+                            $uploadFile->contact_id = $model->id;
+                            if (! ($flag = $uploadFile->save(false))) {
+                                $transaction->rollBack();
+                                break;
+                            }
+                        }
+                    }
+                    if ($flag) {
+                        $transaction->commit();
+                        return $this->redirect(['view', 'id' => $model->id]);
+                    }
+                } catch (Exception $e) {
+                    $transaction->rollBack();
+                }
+//            }
         }
 
         return $this->render('create', [
@@ -113,10 +193,12 @@ class RealContactController extends Controller
             'shabaNumbers' => (empty($shabaNumbers)) ? [new ShabaNumbers()] : $shabaNumbers,
             'socialLink' => (empty($socialLink)) ? [new SocialLink()] : $socialLink,
             'websites' => (empty($websites)) ? [new Websites()] : $websites,
+            'uploadFile' => (empty($uploadFile)) ? [new RealContactFile()] : $uploadFile,
             'searchedTags' => $searchedTags,
             'tagSelected' => $tagSelected,
         ]);
     }
+
 
 
 

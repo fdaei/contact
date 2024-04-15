@@ -49,7 +49,20 @@ class m240407_192037_real_legal_contact extends Migration
 
     public function safeDown()
     {
+        $this->dropForeignKey(
+            'legal_contact_id_ibfk_1',
+            '{{%real_legal_contact}}'
+        );
+        $this->dropForeignKey(
+            'real_contact_id_ibfk_2',
+            '{{%real_legal_contact}}'
+        );
+
+        $this->dropIndex('legal_contact_id_ibfk_1', '{{%real_legal_contact}}');
+        $this->dropIndex('real_contact_id_ibfk_2', '{{%real_legal_contact}}');
+
         $this->dropTable('{{%real_legal_contact}}');
     }
+
 
 }

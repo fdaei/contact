@@ -29,10 +29,58 @@ class m221102_113448_create_table_city extends Migration
         $this->createIndex('created_by', '{{%city}}', ['created_by']);
         $this->createIndex('province_id', '{{%city}}', ['province_id']);
         $this->createIndex('updated_by', '{{%city}}', ['updated_by']);
+
+        $this->addForeignKey(
+            'fk-city-province_id',
+            'city',
+            'province_id',
+            'province',
+            'id',
+            'CASCADE'
+        );
+
+        $this->addForeignKey(
+            'ince_city_ibfk_1',
+            '{{%city}}',
+            ['created_by'],
+            '{{%user}}',
+            ['id'],
+            'RESTRICT',
+            'RESTRICT'
+        );
+        $this->addForeignKey(
+            'ince_city_ibfk_2',
+            '{{%city}}',
+            ['updated_by'],
+            '{{%user}}',
+            ['id'],
+            'RESTRICT',
+            'RESTRICT'
+        );
+
+
     }
 
     public function safeDown()
     {
+        $this->dropForeignKey(
+            'fk-city-province_id',
+            'city'
+        );
+        $this->dropForeignKey(
+            'ince_city_ibfk_1',
+            '{{%city}}'
+        );
+        $this->dropForeignKey(
+            'ince_city_ibfk_2',
+            '{{%city}}'
+        );
+
+        $this->dropIndex('created_by', '{{%city}}');
+        $this->dropIndex('province_id', '{{%city}}');
+        $this->dropIndex('updated_by', '{{%city}}');
+
         $this->dropTable('{{%city}}');
     }
+
 }

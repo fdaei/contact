@@ -2,7 +2,7 @@
 
 use yii\db\Migration;
 
-class m221105_065353_create_table_ince_province extends Migration
+class m221102_113447_create_table_province extends Migration
 {
     public function safeUp()
     {

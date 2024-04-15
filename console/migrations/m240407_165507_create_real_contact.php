@@ -24,10 +24,10 @@ class m240407_165507_create_real_contact extends Migration
                 'image'=> $this->string(256)->null(),
                 'first_name' => $this->string(128)->notNull(),
                 'last_name' => $this->string(128)->notNull(),
-                'national_id' => $this->string(128)->notNull(),
+                'national_code' => $this->string(128)->notNull(),
                 'coin' => $this->integer()->defaultValue(0),
-                'birth_city_id' => $this->integer()->unsigned()->null(),
-                'birth_province_id'=>$this->integer()->unsigned()->null(),
+                'birth_city_id' => $this->integer()->unsigned()->notnull(),
+                'birth_province_id'=>$this->integer()->unsigned()->notnull(),
                 'birth_address'=>$this->string()->null(),
                 'registration_date' =>$this->integer()->unsigned()->notNull(),
                 'status' => $this->tinyInteger()->unsigned()->notNull(),
@@ -51,6 +51,45 @@ class m240407_165507_create_real_contact extends Migration
             ],
             $tableOptions
         );
+
+        $this->createIndex('idx-real_contact-birth_city_id', '{{%real_contact}}', 'birth_city_id');
+        $this->createIndex('idx-real_contact-birth_province_id', '{{%real_contact}}', 'birth_province_id');
+        $this->createIndex('idx-real_contact-created_by', '{{%real_contact}}', 'created_by');
+        $this->createIndex('idx-real_contact-updated_by', '{{%real_contact}}', 'updated_by');
+
+        $this->addForeignKey(
+            'fk-real_contact-birth_city_id',
+            '{{%real_contact}}',
+            'birth_city_id',
+            '{{%city}}',
+            'id',
+            'CASCADE'
+        );
+        $this->addForeignKey(
+            'fk-real_contact-birth_province_id',
+            '{{%real_contact}}',
+            'birth_province_id',
+            '{{%province}}',
+            'id',
+            'CASCADE'
+        );
+        $this->addForeignKey(
+            'fk-real_contact-created_by',
+            '{{%real_contact}}',
+            'created_by',
+            '{{%user}}',
+            'id',
+            'CASCADE'
+        );
+        $this->addForeignKey(
+            'fk-real_contact-updated_by',
+            '{{%real_contact}}',
+            'updated_by',
+            '{{%user}}',
+            'id',
+            'CASCADE'
+        );
+
     }
 
     /**
@@ -58,6 +97,29 @@ class m240407_165507_create_real_contact extends Migration
      */
     public function safeDown()
     {
+        $this->dropForeignKey(
+            'fk-real_contact-birth_city_id',
+            '{{%real_contact}}'
+        );
+        $this->dropForeignKey(
+            'fk-real_contact-birth_province_id',
+            '{{%real_contact}}'
+        );
+        $this->dropForeignKey(
+            'fk-real_contact-created_by',
+            '{{%real_contact}}'
+        );
+        $this->dropForeignKey(
+            'fk-real_contact-updated_by',
+            '{{%real_contact}}'
+        );
+
+        $this->dropIndex('idx-real_contact-birth_city_id', '{{%real_contact}}');
+        $this->dropIndex('idx-real_contact-birth_province_id', '{{%real_contact}}');
+        $this->dropIndex('idx-real_contact-created_by', '{{%real_contact}}');
+        $this->dropIndex('idx-real_contact-updated_by', '{{%real_contact}}');
+
         $this->dropTable('{{%real_contact}}');
+
     }
 }

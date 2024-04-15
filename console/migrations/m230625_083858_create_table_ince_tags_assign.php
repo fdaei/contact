@@ -29,6 +29,10 @@ class m230625_083858_create_table_ince_tags_assign extends Migration
 
     public function safeDown()
     {
+        $this->dropIndex('class', '{{%tags_assign}}');
+        $this->dropIndex('item_tag', '{{%tags_assign}}');
+        $this->dropIndex('unique_tags_assign_row', '{{%tags_assign}}');
         $this->dropTable('{{%tags_assign}}');
     }
+
 }

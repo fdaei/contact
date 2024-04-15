@@ -21,7 +21,6 @@ class m230625_083705_create_table_ince_tags extends Migration
                 'color' => $this->string(10),
                 'status' => $this->tinyInteger()->notNull()->defaultValue('1'),
                 'deleted_at' => $this->integer()->defaultValue('0'),
-                'additional_data' => $this->json()->notNull(),
             ],
             $tableOptions
         );
@@ -32,6 +31,9 @@ class m230625_083705_create_table_ince_tags extends Migration
 
     public function safeDown()
     {
+        $this->dropIndex('fulltext_name', '{{%tags}}');
+        $this->dropIndex('unique_name_type_deleted_at', '{{%tags}}');
         $this->dropTable('{{%tags}}');
     }
+
 }

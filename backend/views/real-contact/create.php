@@ -48,6 +48,7 @@ use yii\helpers\Html;
             'websites' =>  $websites,
             'searchedTags' => $searchedTags,
             'tagSelected' => $tagSelected,
+            'uploadFile'=>$uploadFile,
         ]) ?>
     </div>
 </div>

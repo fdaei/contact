@@ -38,20 +38,19 @@ class Addresses extends Model
         ];
     }
 
-    public static function handleData($defaultData = [])
+    public static function handelData($defaultData = [])
     {
-        $postData = Model::createMultiple(self::class);
+        $postData = \common\models\Model::createMultiple(self::class);
         Model::loadMultiple($postData, Yii::$app->request->post());
         $headlinesJson = [];
         foreach ($postData as $index => $eachData) {
-            if($eachData->validate()){
+            if ($eachData->validate()) {
                 $headlinesJson[] = [
                     'address' => $eachData->address,
                     'postal_code' => $eachData->postal_code,
                     'address_type' => $eachData->address_type,
-                    'province' => $eachData->province,
-                    'city' => $eachData->city,
-                    'district' => $eachData->district,
+                    'province_id' => $eachData->province_id,
+                    'city_id' => $eachData->city_id,
                 ];
             }
         }

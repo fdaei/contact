@@ -16,11 +16,11 @@ class m240407_165307_create_legal_contact extends Migration
             'id' => $this->primaryKey()->unsigned(),
             'logo' => $this->string()->null(),
             'name' => $this->string()->notNull(),
-            'national_id' => $this->string()->notNull(),
+            'national_code' => $this->string()->notNull(),
             'economic_code' => $this->string()->null(),
             'coin' => $this->integer()->defaultValue(0),
-            'registration_city_id' => $this->integer()->unsigned()->null(),
-            'registration_province_id'=>$this->integer()->unsigned()->null(),
+            'registration_city_id' => $this->integer()->unsigned()->notnull(),
+            'registration_province_id'=>$this->integer()->unsigned()->notnull(),
             'registration_address'=>$this->string()->null(),
             'registration_date' => $this->date()->defaultValue(date('Y-m-d')),
             'status' => $this->tinyInteger()->unsigned()->notNull(),
@@ -42,6 +42,44 @@ class m240407_165307_create_legal_contact extends Migration
             'updated_by' => $this->integer()->unsigned()->notNull(),
             'deleted_at' => $this->integer()->unsigned()->defaultValue(0),
         ]);
+        $this->createIndex('idx-legal_contact-registration_city_id', '{{%legal_contact}}', 'registration_city_id');
+        $this->createIndex('idx-legal_contact-registration_province_id', '{{%legal_contact}}', 'registration_province_id');
+        $this->createIndex('idx-legal_contact-created_by', '{{%legal_contact}}', 'created_by');
+        $this->createIndex('idx-legal_contact-updated_by', '{{%legal_contact}}', 'updated_by');
+
+        $this->addForeignKey(
+            'fk-legal_contact-registration_city_id',
+            '{{%legal_contact}}',
+            'registration_city_id',
+            '{{%city}}',
+            'id',
+            'CASCADE'
+        );
+        $this->addForeignKey(
+            'fk-legal_contact-registration_province_id',
+            '{{%legal_contact}}',
+            'registration_province_id',
+            '{{%province}}',
+            'id',
+            'CASCADE'
+        );
+        $this->addForeignKey(
+            'fk-legal_contact-created_by',
+            '{{%legal_contact}}',
+            'created_by',
+            '{{%user}}',
+            'id',
+            'CASCADE'
+        );
+        $this->addForeignKey(
+            'fk-legal_contact-updated_by',
+            '{{%legal_contact}}',
+            'updated_by',
+            '{{%user}}',
+            'id',
+            'CASCADE'
+        );
+
     }
 
     /**
@@ -49,6 +87,29 @@ class m240407_165307_create_legal_contact extends Migration
      */
     public function safeDown()
     {
+        $this->dropForeignKey(
+            'fk-legal_contact-registration_city_id',
+            '{{%legal_contact}}'
+        );
+        $this->dropForeignKey(
+            'fk-legal_contact-registration_province_id',
+            '{{%legal_contact}}'
+        );
+        $this->dropForeignKey(
+            'fk-legal_contact-created_by',
+            '{{%legal_contact}}'
+        );
+        $this->dropForeignKey(
+            'fk-legal_contact-updated_by',
+            '{{%legal_contact}}'
+        );
+
+        $this->dropIndex('idx-legal_contact-registration_city_id', '{{%legal_contact}}');
+        $this->dropIndex('idx-legal_contact-registration_province_id', '{{%legal_contact}}');
+        $this->dropIndex('idx-legal_contact-created_by', '{{%legal_contact}}');
+        $this->dropIndex('idx-legal_contact-updated_by', '{{%legal_contact}}');
+
         $this->dropTable('{{%legal_contact}}');
+
     }
 }

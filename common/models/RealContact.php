@@ -17,7 +17,7 @@ use yii2tech\ar\softdelete\SoftDeleteBehavior;
  * @property string|null $image
  * @property string $first_name
  * @property string $last_name
- * @property string $national_id
+ * @property string $national_code
  * @property int|null $coin
  * @property int|null $birth_city_id
  * @property int|null $birth_province_id
@@ -62,14 +62,14 @@ class RealContact extends ActiveRecord
     public function rules()
     {
         return [
-            [['first_name', 'last_name', 'national_id', 'registration_date', 'status', 'created_at', 'created_by', 'updated_at', 'updated_by'], 'required'],
-            [['coin', 'birth_city_id', 'birth_province_id', 'registration_date', 'status', 'created_at', 'created_by', 'updated_at', 'updated_by', 'deleted_at'], 'integer'],
+            [['first_name', 'last_name', 'national_code', 'registration_date', 'status'], 'required'],
+            [['coin', 'birth_city_id', 'birth_province_id', 'status', 'created_at', 'created_by', 'updated_at', 'updated_by', 'deleted_at'], 'integer'],
             [['summary', 'description', 'mobile_numbers', 'social_links', 'phone_numbers', 'fax_numbers', 'addresses', 'emails', 'websites', 'bank_accounts', 'cards', 'shaba_numbers'], 'string'],
-            [['image'], 'string', 'max' => 256],
-            [['first_name', 'last_name', 'national_id'], 'string', 'max' => 128],
+            [['first_name', 'last_name', 'national_code'], 'string', 'max' => 128],
             [['birth_address'], 'string', 'max' => 255],
             [['contact_tag'], 'required'],
             [['tagNames', 'contact_tag'], 'safe'],
+            ['image', 'image','extensions' => 'jpg, jpeg, png'],
         ];
     }
 
@@ -82,7 +82,7 @@ class RealContact extends ActiveRecord
             'id' => Yii::t('app', 'ID'),
             'name' => Yii::t('app', 'Name'),
             'contact_type' => Yii::t('app', 'Contact Type'),
-            'national_id' => Yii::t('app', 'National ID'),
+            'national_code' => Yii::t('app', 'National Code'),
             'economic_code' => Yii::t('app', 'Economic Code'),
             'coin' => Yii::t('app', 'Coin'),
             'city' => Yii::t('app', 'City'),

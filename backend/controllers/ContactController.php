@@ -43,12 +43,12 @@ class ContactController extends Controller
     public function actionIndex()
     {
         $legalContacts = LegalContact::find()
-            ->select(['id','name', 'registration_city_id as city','national_id','economic_code','coin','registration_date','status', 'registration_province_id as province', 'registration_address as address'])
+            ->select(['id','name', 'registration_city_id as city','national_code','economic_code','coin','registration_date','status', 'registration_province_id as province', 'registration_address as address'])
             ->asArray()
             ->all();
 
         $realContacts = RealContact::find()
-            ->select(['id','last_name as name', 'birth_city_id as city','national_id','coin','registration_date','status', 'birth_province_id as province', 'birth_address as address'])
+            ->select(['id','last_name as name', 'birth_city_id as city','national_code','coin','registration_date','status', 'birth_province_id as province', 'birth_address as address'])
             ->asArray()
             ->all();
         foreach ($legalContacts as &$contact) {

@@ -23,7 +23,7 @@ use yii\widgets\ActiveForm;
         <div class='col-md-8'> <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
 
         </div>
-        <div class='col-md-8'> <?= $form->field($model, 'national_id')->textInput(['maxlength' => true]) ?>
+        <div class='col-md-8'> <?= $form->field($model, 'national_code')->textInput(['maxlength' => true]) ?>
 
         </div>
         <div class='col-md-8'> <?= $form->field($model, 'economic_code')->textInput(['maxlength' => true]) ?>

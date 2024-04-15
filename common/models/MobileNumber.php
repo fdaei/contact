@@ -16,8 +16,8 @@ class MobileNumber extends Model
     public function rules()
     {
         return [
-            [['mobile_title','mobile_number', 'mobile_type', 'message_link', 'item_alias'],'required'],
-            [['mobile_title','mobile_number', 'mobile_type', 'message_link', 'item_alias'],'string'],
+            [['mobile_title','mobile_number', 'mobile_type', 'message_link'],'required'],
+            [['mobile_title','mobile_number', 'mobile_type', 'message_link'],'string'],
         ];
     }
 

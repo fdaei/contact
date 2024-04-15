@@ -18,7 +18,7 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'last_name')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'national_id')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'national_code')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'coin')->textInput() ?>
 
