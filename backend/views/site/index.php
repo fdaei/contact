@@ -22,7 +22,7 @@ use yii\widgets\Pjax;
 
 /* @var $this View */
 
-$this->title = "پنل مدیریت مبیت";
+$this->title = "پنل مدیریت ";
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="card">

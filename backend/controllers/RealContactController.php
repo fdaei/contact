@@ -161,6 +161,9 @@ class RealContactController extends Controller
 
 //            if ($valid) {
                 $transaction = \Yii::$app->db->beginTransaction();
+            if ($searchedTags) {
+                $model->setTags($tagSelected, true);
+            }
                 try {
                     if ($flag = $model->save(false)) {
                         foreach ($uploadFiles as $uploadFile) {
@@ -183,17 +186,17 @@ class RealContactController extends Controller
 
         return $this->render('create', [
             'model' => $model,
-            'mobileNumbers' => (empty($mobileNumbers)) ? [new MobileNumber()] : $mobileNumbers,
-            'faxNumbers' => (empty($faxNumbers)) ? [new FaxNumbers()] : $faxNumbers,
-            'phoneNumbers' => (empty($phoneNumbers)) ? [new PhoneNumbers()] : $phoneNumbers,
-            'addresses' => (empty($addresses)) ? [new Addresses()] : $addresses,
-            'bankAccounts' => (empty($bankAccounts)) ? [new BankAccounts()] : $bankAccounts,
-            'cards' => (empty($cards)) ? [new Cards()] : $cards,
-            'emails' => (empty($emails)) ? [new Emails()] : $emails,
-            'shabaNumbers' => (empty($shabaNumbers)) ? [new ShabaNumbers()] : $shabaNumbers,
-            'socialLink' => (empty($socialLink)) ? [new SocialLink()] : $socialLink,
-            'websites' => (empty($websites)) ? [new Websites()] : $websites,
-            'uploadFile' => (empty($uploadFile)) ? [new RealContactFile()] : $uploadFile,
+//            'mobileNumbers' => (empty($mobileNumbers)) ? [new MobileNumber()] : $mobileNumbers,
+//            'faxNumbers' => (empty($faxNumbers)) ? [new FaxNumbers()] : $faxNumbers,
+//            'phoneNumbers' => (empty($phoneNumbers)) ? [new PhoneNumbers()] : $phoneNumbers,
+//            'addresses' => (empty($addresses)) ? [new Addresses()] : $addresses,
+//            'bankAccounts' => (empty($bankAccounts)) ? [new BankAccounts()] : $bankAccounts,
+//            'cards' => (empty($cards)) ? [new Cards()] : $cards,
+//            'emails' => (empty($emails)) ? [new Emails()] : $emails,
+//            'shabaNumbers' => (empty($shabaNumbers)) ? [new ShabaNumbers()] : $shabaNumbers,
+//            'socialLink' => (empty($socialLink)) ? [new SocialLink()] : $socialLink,
+//            'websites' => (empty($websites)) ? [new Websites()] : $websites,
+//            'uploadFile' => (empty($uploadFile)) ? [new RealContactFile()] : $uploadFile,
             'searchedTags' => $searchedTags,
             'tagSelected' => $tagSelected,
         ]);

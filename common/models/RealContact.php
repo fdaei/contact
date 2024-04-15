@@ -122,7 +122,8 @@ class RealContact extends ActiveRecord
                     break;
                 }
 
-                $existingTag = Tag::findOne(['tag_id' => $tagName]);
+                $existingTag = Tag::findOne(['name' => $tagName]);
+
                 if ($existingTag) {
                     $tagIds[] = $existingTag->tag_id;
                 } else {
