@@ -63,11 +63,11 @@ class RealContact extends ActiveRecord
     {
         return [
             [['first_name', 'last_name', 'national_code', 'registration_date', 'status'], 'required'],
-            [['coin', 'birth_city_id', 'birth_province_id', 'status', 'created_at', 'created_by', 'updated_at', 'updated_by', 'deleted_at'], 'integer'],
+            [['coin', 'birth_city_id', 'birth_province_id', 'status'], 'integer'],
             [['summary', 'description', 'mobile_numbers', 'social_links', 'phone_numbers', 'fax_numbers', 'addresses', 'emails', 'websites', 'bank_accounts', 'cards', 'shaba_numbers'], 'string'],
             [['first_name', 'last_name', 'national_code'], 'string', 'max' => 128],
             [['birth_address'], 'string', 'max' => 255],
-            [['contact_tag'], 'required'],
+//            [['contact_tag'], 'required'],
             [['tagNames', 'contact_tag'], 'safe'],
             ['image', 'image','extensions' => 'jpg, jpeg, png'],
         ];

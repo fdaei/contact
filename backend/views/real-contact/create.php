@@ -14,6 +14,7 @@ use yii\helpers\Html;
 /** @var common\models\ShabaNumbers $shabaNumbers */
 /** @var common\models\SocialLink $socialLink */
 /** @var common\models\Websites $websites */
+/** @var common\models\RealContactFile $uploadFile */
 
 
 ?>

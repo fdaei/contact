@@ -2,10 +2,11 @@
 
 namespace common\models;
 
-use sadi01\moresettings\behaviors\UploadBehavior;
+
 use Yii;
 use yii\behaviors\BlameableBehavior;
 use yii\behaviors\TimestampBehavior;
+use common\behaviors\UploadBehavior;
 use yii2tech\ar\softdelete\SoftDeleteBehavior;
 
 /**
@@ -39,14 +40,16 @@ class RealContactFile extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['file_name', 'file_path', 'contact_id'], 'required'],
-            [['contact_id', 'created_at', 'created_by', 'updated_at', 'updated_by', 'deleted_at'], 'integer'],
-            [['file_name', 'file_path'], 'string', 'max' => 255],
+            [['file_name'], 'required'],
+            [['contact_id'], 'integer'],
+            [['file_path'], 'safe'],
+            [['file_path'], 'file'],
             [['contact_id'], 'exist', 'skipOnError' => true, 'targetClass' => RealContact::class, 'targetAttribute' => ['contact_id' => 'id']],
             [['created_by'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['created_by' => 'id']],
             [['updated_by'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['updated_by' => 'id']],
         ];
     }
+
 
     /**
      * {@inheritdoc}
@@ -133,13 +136,13 @@ class RealContactFile extends \yii\db\ActiveRecord
                 'replaceRegularDelete' => false,
                 'invokeDeleteEvents' => false
             ],
-//            [
-//                'class' => UploadBehavior::class,
-//                'attribute' => 'file_path',
-//                'scenarios' => [self::SCENARIO_DEFAULT],
-//                'path' => '@webroot/upload/contact/real/file',
-//                'url' => '@web/upload/contact/real/file',
-//            ],
+            [
+                'class' => UploadBehavior::class,
+                'attribute' => 'file_path',
+                'scenarios' => [self::SCENARIO_DEFAULT],
+                'path' => '@webroot/upload/contact/real',
+                'url' => '@web/upload/contact/real',
+            ],
         ];
     }
 }

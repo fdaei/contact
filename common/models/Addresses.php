@@ -22,8 +22,8 @@ class Addresses extends Model
     {
         return [
             [['address', 'postal_code', 'address_type', 'province_id', 'city_id'], 'required'],
-            [['address', 'address_type', 'province_id', 'city_id'], 'string'],
-            [['postal_code'], 'integer'],
+            [['address', 'address_type'], 'string'],
+            [['postal_code', 'province_id', 'city_id'], 'integer'],
         ];
     }
 

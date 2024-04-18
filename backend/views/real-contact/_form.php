@@ -35,8 +35,7 @@ use yii\widgets\ActiveForm;
 
 <div class="real-contact-form">
 
-    <?php
-    $form = ActiveForm::begin(['id' => 'dynamic-form']); ?>
+    <?php $form = ActiveForm::begin(['options' => ['enctype' => 'multipart/form-data'],'id' => 'dynamic-form']); ?>
     <div class="row justify-content-center">
         <div class='col-md-3'>
             <?= $form->field($model, 'first_name')->textInput(['maxlength' => true]) ?>
@@ -120,8 +119,11 @@ use yii\widgets\ActiveForm;
                             'model' => $addresses[0],
                             'formId' => 'dynamic-form',
                             'formFields' => [
-                                'mobile_title',
-                                'mobile_number'
+                                'address',
+                                'postal_code',
+                                'city_id',
+                                'province_id',
+                                'address_type',
                             ],
                         ]); ?>
                         <div class="container-items">
@@ -146,7 +148,7 @@ use yii\widgets\ActiveForm;
                                                 <?= $form->field($address, "[{$i}]postal_code")->textInput(['maxlength' => true]) ?>
                                             </div>
                                             <div class='col-md-4'>
-                                                <?= $form->field($address, 'city_id')->widget(Select2::class, [
+                                                <?= $form->field($address, "[{$i}]city_id")->widget(Select2::class, [
                                                     'data' => ArrayHelper::map(City::find()->all(), 'id', 'name'),
                                                     'size' => Select2::MEDIUM,
                                                     'options' => ['placeholder' => Yii::t('app', 'Select Province')],
@@ -157,7 +159,7 @@ use yii\widgets\ActiveForm;
                                                 ?>
                                             </div>
                                             <div class='col-md-4'>
-                                                <?= $form->field($address, 'province_id')->widget(Select2::class, [
+                                                <?= $form->field($address, "[{$i}]province_id")->widget(Select2::class, [
                                                     'data' => ArrayHelper::map(Province::find()->all(), 'id', 'name'),
                                                     'size' => Select2::MEDIUM,
                                                     'options' => ['placeholder' => Yii::t('app', 'Select Province')],
@@ -734,9 +736,12 @@ use yii\widgets\ActiveForm;
                                         <div class="row">
                                             <div class="col-sm-12">
                                                 <?= $form->field($file, "[{$i}]file_name")->textInput(['maxlength' => true]) ?>
-                                            </div>
-                                            <div class="col-sm-12">
-                                                <?= $form->field($file, "[{$i}]file_path")->fileInput() ?>
+                                                <div class="col-md-6 text-center">
+                                                    <?= $form->field($file, "[{$i}]file_path")->widget(FileInput::class, [
+                                                        'name' => 'attachment_3',
+                                                        'options' => ['accept' => '*'],
+                                                    ]) ?>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>

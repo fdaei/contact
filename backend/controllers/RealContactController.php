@@ -22,6 +22,7 @@ use yii\db\Exception;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\web\UploadedFile;
 
 /**
  * RealContactController implements the CRUD actions for RealContact model.
@@ -93,7 +94,7 @@ class RealContactController extends Controller
         $shabaNumbers = [new ShabaNumbers()];
         $socialLink = [new SocialLink()];
         $websites = [new Websites()];
-        $uploadFiles = [new RealContactFile()];
+        $uploadFiles = [new RealContactFile];
         $searchedTags = Tag::find()->andWhere(['in', 'tag_id', $model->tagNames])->asArray()->all();
         $tagSelected = [];
 
@@ -155,19 +156,28 @@ class RealContactController extends Controller
             $uploadFiles = Model::createMultiple(RealContactFile::classname());
             Model::loadMultiple($uploadFiles, Yii::$app->request->post());
 
-
             $valid = $model->validate();
-//            $valid = Model::validateMultiple($uploadFiles) && $valid;
-
-//            if ($valid) {
+            $valid = Model::validateMultiple($uploadFiles) && $valid;
+            if ($valid) {
                 $transaction = \Yii::$app->db->beginTransaction();
-            if ($searchedTags) {
+            if ($tagSelected) {
                 $model->setTags($tagSelected, true);
             }
                 try {
                     if ($flag = $model->save(false)) {
-                        foreach ($uploadFiles as $uploadFile) {
+                        foreach ($uploadFiles as $i => $uploadFile) {
                             $uploadFile->contact_id = $model->id;
+                            $fileInstance = UploadedFile::getInstance($uploadFile, "[{$i}]file_path");
+
+                            if ($fileInstance) {
+                                $filePath = Yii::getAlias('@webroot') . '/upload/contact/real/' . $fileInstance->name;
+                                if ($fileInstance->saveAs($filePath)) {
+                                    $uploadFile->file_path = $fileInstance->name;
+                                } else {
+                                    Yii::$app->getSession()->setFlash('error', 'Error saving recipe images, Please enter valid images');
+                                }
+                            }
+
                             if (! ($flag = $uploadFile->save(false))) {
                                 $transaction->rollBack();
                                 break;
@@ -179,24 +189,25 @@ class RealContactController extends Controller
                         return $this->redirect(['view', 'id' => $model->id]);
                     }
                 } catch (Exception $e) {
+                var_dump($e->getMessage());die();
                     $transaction->rollBack();
                 }
-//            }
+            }
         }
 
         return $this->render('create', [
             'model' => $model,
-//            'mobileNumbers' => (empty($mobileNumbers)) ? [new MobileNumber()] : $mobileNumbers,
-//            'faxNumbers' => (empty($faxNumbers)) ? [new FaxNumbers()] : $faxNumbers,
-//            'phoneNumbers' => (empty($phoneNumbers)) ? [new PhoneNumbers()] : $phoneNumbers,
-//            'addresses' => (empty($addresses)) ? [new Addresses()] : $addresses,
-//            'bankAccounts' => (empty($bankAccounts)) ? [new BankAccounts()] : $bankAccounts,
-//            'cards' => (empty($cards)) ? [new Cards()] : $cards,
-//            'emails' => (empty($emails)) ? [new Emails()] : $emails,
-//            'shabaNumbers' => (empty($shabaNumbers)) ? [new ShabaNumbers()] : $shabaNumbers,
-//            'socialLink' => (empty($socialLink)) ? [new SocialLink()] : $socialLink,
-//            'websites' => (empty($websites)) ? [new Websites()] : $websites,
-//            'uploadFile' => (empty($uploadFile)) ? [new RealContactFile()] : $uploadFile,
+            'mobileNumbers' => (empty($mobileNumbers)) ? [new MobileNumber()] : $mobileNumbers,
+            'faxNumbers' => (empty($faxNumbers)) ? [new FaxNumbers()] : $faxNumbers,
+            'phoneNumbers' => (empty($phoneNumbers)) ? [new PhoneNumbers()] : $phoneNumbers,
+            'addresses' => (empty($addresses)) ? [new Addresses()] : $addresses,
+            'bankAccounts' => (empty($bankAccounts)) ? [new BankAccounts()] : $bankAccounts,
+            'cards' => (empty($cards)) ? [new Cards()] : $cards,
+            'emails' => (empty($emails)) ? [new Emails()] : $emails,
+            'shabaNumbers' => (empty($shabaNumbers)) ? [new ShabaNumbers()] : $shabaNumbers,
+            'socialLink' => (empty($socialLink)) ? [new SocialLink()] : $socialLink,
+            'websites' => (empty($websites)) ? [new Websites()] : $websites,
+            'uploadFile' => (empty($uploadFile)) ? [new RealContactFile] : $uploadFile,
             'searchedTags' => $searchedTags,
             'tagSelected' => $tagSelected,
         ]);
