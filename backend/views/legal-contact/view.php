@@ -5,10 +5,6 @@ use yii\widgets\DetailView;
 
 /** @var yii\web\View $this */
 /** @var common\models\LegalContact $model */
-
-$this->title = $model->name;
-$this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Legal Contacts'), 'url' => ['index']];
-$this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
 ?>
 <div class="legal-contact-view">
@@ -35,7 +31,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         'id',
             'logo',
             'name',
-            'national_id',
+            'national_code',
             'economic_code',
             'coin',
             'registration_city_id',

@@ -16,7 +16,7 @@ use yii\helpers\Html;
 /** @var common\models\Websites $websites */
 /** @var common\models\RealContactFile $uploadFile */
 
-
+$this->title = "ایجاد مخاطب حقیقی";
 ?>
 <div class="contact-create">
     <ul class="nav nav-tabs nav-fill bg-white pt-3" id="contactTabs" role="tablist">

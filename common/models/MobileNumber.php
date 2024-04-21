@@ -68,16 +68,27 @@ class MobileNumber extends Model
             return isset($_items[$type]) ? $_items[$type] : false;
     }
 
-    public static function loadDefaultValue($datas)
+    public static function loadDefaultValue($jsonData, $modelClass)
     {
-        $arrayData = [];
-        for ($i = 0; $i < count($datas); $i++) {
-            $arrayData[$i] = new self();
-            $arrayData[$i]->attributes = $datas[$i];
+        $models = [];
+
+        if (!empty($jsonData) && is_string($jsonData)) {
+            $decodedData = json_decode($jsonData, true);
+
+            if (is_array($decodedData)) {
+                foreach ($decodedData as $data) {
+                    $model = new $modelClass();
+                    $model->attributes = $data;
+                    $models[] = $model;
+                }
+            } else {
+                $models[] = new $modelClass();
+            }
+        } else {
+            $models[] = new $modelClass();
         }
-        if (empty($arrayData)) {
-            $arrayData = [new self()];
-        }
-        return $arrayData;
+
+        return $models;
     }
+
 }

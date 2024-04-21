@@ -39,17 +39,28 @@ class PhoneNumbers extends Model
         }
         return $headlinesJson;
     }
-    public static function loadDefaultValue($datas){
-        $arrayData = [];
-        for ($i = 0; $i < count($datas); $i++) {
-            $arrayData[$i] = new self();
-            $arrayData[$i]->attributes = $datas[$i];
-        }
-        if(empty($arrayData)){
-            $arrayData = [new self()];
-        }
-        return $arrayData;
+    public static function loadDefaultValue($jsonData, $modelClass)
+    {
+        $models = [];
 
+        if (!empty($jsonData) && is_string($jsonData)) {
+            $decodedData = json_decode($jsonData, true);
+
+            if (is_array($decodedData)) {
+                foreach ($decodedData as $data) {
+                    $model = new $modelClass();
+                    $model->attributes = $data;
+                    $models[] = $model;
+                }
+            } else {
+                $models[] = new $modelClass();
+            }
+        } else {
+            $models[] = new $modelClass();
+        }
+
+        return $models;
     }
+
 
 }

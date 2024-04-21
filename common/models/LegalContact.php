@@ -2,11 +2,12 @@
 
 namespace common\models;
 
-use common\behaviors\CdnUploadImageBehavior;
-use sadi01\moresettings\behaviors\UploadImageBehavior;
+use common\behaviors\Taggable;
+use common\behaviors\UploadBehavior;
 use Yii;
 use yii\behaviors\BlameableBehavior;
 use yii\behaviors\TimestampBehavior;
+use yii\helpers\Url;
 use yii2tech\ar\softdelete\SoftDeleteBehavior;
 
 /**
@@ -15,7 +16,7 @@ use yii2tech\ar\softdelete\SoftDeleteBehavior;
  * @property int $id
  * @property string|null $logo
  * @property string $name
- * @property string $national_id
+ * @property string $national_code
  * @property string|null $economic_code
  * @property int|null $coin
  * @property int|null $registration_city_id
@@ -46,6 +47,8 @@ class LegalContact extends \yii\db\ActiveRecord
     const STATUS_ACTIVE = 1;
     const STATUS_DELETED = 0;
     const STATUS_INACTIVE = 2;
+
+    public $contact_tag;
     /**
      * {@inheritdoc}
      */
@@ -60,11 +63,13 @@ class LegalContact extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['name', 'national_id', 'status', 'created_at', 'created_by', 'updated_at', 'updated_by'], 'required'],
-            [['coin', 'registration_city_id', 'registration_province_id', 'status', 'created_at', 'created_by', 'updated_at', 'updated_by', 'deleted_at'], 'integer'],
+            [['name', 'national_code', 'status'], 'required'],
+            [['coin', 'registration_city_id', 'registration_province_id', 'status'], 'integer'],
             [['registration_date'], 'safe'],
             [['summary', 'description', 'mobile_numbers', 'social_links', 'phone_numbers', 'fax_numbers', 'addresses', 'emails', 'websites', 'bank_accounts', 'cards', 'shaba_numbers'], 'string'],
-            [['logo', 'name', 'national_id', 'economic_code', 'registration_address'], 'string', 'max' => 255],
+            [[ 'name', 'national_code', 'economic_code', 'registration_address'], 'string', 'max' => 255],
+            [['tagNames', 'contact_tag'], 'safe'],
+            ['logo', 'image','extensions' => 'jpg, jpeg, png'],
         ];
     }
 
@@ -77,7 +82,7 @@ class LegalContact extends \yii\db\ActiveRecord
             'id' => Yii::t('app', 'ID'),
             'logo' => Yii::t('app', 'Logo'),
             'name' => Yii::t('app', 'Name'),
-            'national_id' => Yii::t('app', 'National ID'),
+            'national_code' => Yii::t('app', 'National ID'),
             'economic_code' => Yii::t('app', 'Economic Code'),
             'coin' => Yii::t('app', 'Coin'),
             'registration_city_id' => Yii::t('app', 'Registration City ID'),
@@ -102,7 +107,40 @@ class LegalContact extends \yii\db\ActiveRecord
             'updated_at' => Yii::t('app', 'Updated At'),
             'updated_by' => Yii::t('app', 'Updated By'),
             'deleted_at' => Yii::t('app', 'Deleted At'),
+            'tagNames' => Yii::t('app', 'Tags'),
+            'contact_tag' => Yii::t('app', 'Contact Tag'),
         ];
+    }
+
+    public function getFile()
+    {
+        return $this->hasMany(LegalContactFile::class, ['contact_id' => 'id']);
+    }
+
+    public function setTags(array $searchedTags, bool $flag)
+    {
+        if (!empty($searchedTags)) {
+            $tagIds = [];
+            foreach ($searchedTags as $tagName) {
+                if (!$flag) {
+                    break;
+                }
+
+                $existingTag = Tag::findOne(['name' => $tagName]);
+
+                if ($existingTag) {
+                    $tagIds[] = $existingTag->tag_id;
+                } else {
+                    $newTag = new Tag(['name' => $tagName, 'type' => '1']);
+                    if ($flag = $newTag->save()) {
+                        $tagIds[] = $newTag->tag_id;
+                    }
+                }
+            }
+            $this->tagNames = $tagIds;
+        } else {
+            $this->tagNames = [];
+        }
     }
 
     public static function itemAlias($type, $code = NULL)
@@ -141,6 +179,11 @@ class LegalContact extends \yii\db\ActiveRecord
                 'createdByAttribute' => 'created_by',
                 'updatedByAttribute' => 'updated_by',
             ],
+            'taggable' => [
+                'class' => Taggable::class,
+                'classAttribute' => self::class,
+                'deleteTagsScenario' => self::SCENARIO_DEFAULT
+            ],
             'softDeleteBehavior' => [
                 'class' => SoftDeleteBehavior::class,
                 'softDeleteAttributeValues' => [
@@ -154,20 +197,13 @@ class LegalContact extends \yii\db\ActiveRecord
                 'replaceRegularDelete' => false, // mutate native `delete()` method
                 'invokeDeleteEvents' => false
             ],
-//            [
-//                'class' => UploadImageBehavior::class,
-//                'attribute' => 'logo',
-//                'scenarios' => [self::SCENARIO_DEFAULT],
-//                'instanceByName' => false,
-//                //'placeholder' => "/assets/images/default.jpg",
-//                'deleteBasePathOnDelete' => false,
-//                'createThumbsOnSave' => false,
-//                'transferToCDN' => false,
-//                'cdnPath' => "@cdnRoot/legalContact",
-//                'basePath' => "@inceRoot/legalContact",
-//                'path' => "@inceRoot/legalContact",
-//                'url' => "@cdnWeb/legalContact"
-//            ],
+            [
+                'class' => UploadBehavior::class,
+                'attribute' => 'logo',
+                'scenarios' => [self::SCENARIO_DEFAULT],
+                'path' => '@webroot/upload/contact/real',
+                'url' => Url::to('@web/upload/contact/real'),
+            ],
         ];
     }
     /**

@@ -11,7 +11,7 @@ class RealContactFileQuery extends \yii\db\ActiveQuery
 {
     public function active()
     {
-        return $this->onCondition(['<>', 'status',  RealContactFile::STATUS_DELETED]);
+        return $this;
     }
 
     /**

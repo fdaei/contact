@@ -67,11 +67,22 @@ class RealContact extends ActiveRecord
             [['summary', 'description', 'mobile_numbers', 'social_links', 'phone_numbers', 'fax_numbers', 'addresses', 'emails', 'websites', 'bank_accounts', 'cards', 'shaba_numbers'], 'string'],
             [['first_name', 'last_name', 'national_code'], 'string', 'max' => 128],
             [['birth_address'], 'string', 'max' => 255],
-//            [['contact_tag'], 'required'],
-            [['tagNames', 'contact_tag'], 'safe'],
+            [['tagNames', 'contact_tag','addresses'], 'safe'],
             ['image', 'image','extensions' => 'jpg, jpeg, png'],
         ];
     }
+
+    public function beforeValidate()
+    {
+        if (parent::beforeValidate()) {
+            $this->registration_date = strtotime(str_replace('/', '-', $this->registration_date));
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+
 
     /**
      * {@inheritdoc}
@@ -111,6 +122,49 @@ class RealContact extends ActiveRecord
             'tagNames' => Yii::t('app', 'Tags'),
             'contact_tag' => Yii::t('app', 'Contact Tag'),
         ];
+    }
+
+
+    public function getFile()
+    {
+        return $this->hasMany(RealContactFile::class, ['contact_id' => 'id']);
+    }
+
+    /**
+     * Gets query for [[CreatedBy]].
+     *
+     * @return \yii\db\ActiveQuery|yii\db\ActiveQuery
+     */
+    public function getCreatedBy()
+    {
+        return $this->hasOne(User::class, ['id' => 'created_by']);
+    }
+
+    /**
+     * Gets query for [[Province]].
+     *
+     * @return \yii\db\ActiveQuery|ProvinceQuery
+     */
+    public function getProvince()
+    {
+        return $this->hasOne(Province::class, ['id' => 'birth_province_id']);
+    }
+
+    public function getCity()
+    {
+        return $this->hasOne(City::class, ['id' => 'birth_city_id']);
+    }
+
+
+
+    /**
+     * Gets query for [[UpdatedBy]].
+     *
+     * @return \yii\db\ActiveQuery|yii\db\ActiveQuery
+     */
+    public function getUpdatedBy()
+    {
+        return $this->hasOne(User::class, ['id' => 'updated_by']);
     }
 
     public function setTags(array $searchedTags, bool $flag)
@@ -195,9 +249,9 @@ class RealContact extends ActiveRecord
             ],
             [
                 'class' => UploadBehavior::class,
-                'attribute' => 'image',
+                'attribute' => 'logo',
                 'scenarios' => [self::SCENARIO_DEFAULT],
-                'path' => '@webroot/upload/contact/real',
+                'path' => '@web/upload/contact/real',
                 'url' => '@web/upload/contact/real',
             ],
         ];

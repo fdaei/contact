@@ -92,16 +92,16 @@ $this->params['breadcrumbs'][] = $this->title;
                 'buttons' => [
                     'view' => function ($url, $model, $key) {
                         if ($model['contact_type'] == 'Real') {
-                            return Html::a('<span class="fa fa-eye text-warning"></span>', ['update-real', 'id' => $model['id']]);
+                            return Html::a('<span class="fa fa-eye text-warning"></span>', ['/real-contact/view', 'id' => $model['id']]);
                         } elseif ($model['contact_type'] == 'Legal') {
-                            return Html::a('<span class="fa fa-eye text-warning"></span>', ['update-legal', 'id' => $model['id']]);
+                            return Html::a('<span class="fa fa-eye text-warning"></span>', ['/legal-contact/view', 'id' => $model['id']]);
                         }
                     },
                     'update' => function ($url, $model, $key) {
                         if ($model['contact_type'] == 'Real') {
-                            return Html::a('<span class="fa fa-pencil text-info"></span>', ['update-real', 'id' => $model['id']]);
+                            return Html::a('<span class="fa fa-pencil text-info"></span>', ['/real-contact/update', 'id' => $model['id']]);
                         } elseif ($model['contact_type'] == 'Legal') {
-                            return Html::a('<span class="fa fa-pencil text-info"></span>', ['update-legal', 'id' => $model['id']]);
+                            return Html::a('<span class="fa fa-pencil text-info"></span>', ['/legal-contact/update', 'id' => $model['id']]);
                         }
                     },
                     'delete' => function ($url, $model, $key) {

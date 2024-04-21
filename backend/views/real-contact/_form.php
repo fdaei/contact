@@ -35,21 +35,61 @@ use yii\widgets\ActiveForm;
 
 <div class="real-contact-form">
 
-    <?php $form = ActiveForm::begin(['options' => ['enctype' => 'multipart/form-data'],'id' => 'dynamic-form']); ?>
+    <?php $form = ActiveForm::begin(['options' => ['enctype' => 'multipart/form-data'], 'id' => 'dynamic-form']); ?>
     <div class="row justify-content-center">
-        <div class='col-md-3'>
+        <div class='col-md-2'>
             <?= $form->field($model, 'first_name')->textInput(['maxlength' => true]) ?>
         </div>
-        <div class='col-md-3'>
+        <div class='col-md-2'>
             <?= $form->field($model, 'last_name')->textInput(['maxlength' => true]) ?>
         </div>
-        <div class='col-md-3'>
+        <div class='col-md-2'>
             <?= $form->field($model, 'national_code')->textInput(['maxlength' => true]) ?>
         </div>
-        <div class='col-md-3'>
+        <div class='col-md-2'>
             <?= $form->field($model, 'coin')->input('number') ?>
         </div>
-        <div class='col-md-3'>
+        <div class='col-md-4'>
+            <?=
+            $form->field($model, 'contact_tag')->widget(Select2::class, [
+                'data' => $model->isNewRecord ? $tagSelected : ArrayHelper::map($searchedTags, 'tag_id', 'name'),
+                'options' => [
+                    'value' => $model->isNewRecord ? $tagSelected : ArrayHelper::map($searchedTags, 'tag_id', 'name'),
+                    'multiple' => true,
+                    'placeholder' => 'یک یا چند تگ را انتخاب نمایید...',
+                    'dir' => 'rtl',
+                    'data-id' => $model->id,
+                    'data-tags' => $model->isNewRecord ? $tagSelected : ArrayHelper::map($searchedTags, 'tag_id', 'type'),
+                    'data-tags-name' => $model->isNewRecord ? $tagSelected : ArrayHelper::map($searchedTags, 'tag_id', 'name'),
+                    'data-tags-type' => Tag::itemAlias('TypeClass'),
+                    'class' => 'form-control TagInput',
+                ],
+                'pluginOptions' => [
+                    'allowClear' => true,
+                    'closeOnSelect' => false,
+                    'minimumInputLength' => 2,
+                    'ajax' => [
+                        'url' => Url::to(['/tag/list', 'type' => null]),
+                        'dataType' => 'json',
+                        'data' => new JsExpression('function(params) { return {query:params.term}; }'),
+                    ],
+                    'escapeMarkup' => new JsExpression('function (markup) { return markup; }'),
+                    'templateResult' => new JsExpression('function (data) { return (data.html != undefined) ? data.text : null; }'),
+                    'templateSelection' => new JsExpression('function (data)
+                    {
+                        var selectElement = $(data.element).parent();
+                        if(selectElement.data("tags")[data.id] != undefined){
+                            var type = selectElement.data("tags")[data.id];
+                            var typeClass = $(".TagInput").data("tags-type")[type];
+                            return "<span class=\"text-bold badge badge-" + typeClass + "\">" + data.text + "</span>";
+                        }else{
+                            return data.text;
+                        }
+                    }'),
+                ]
+            ]); ?>
+        </div>
+        <div class='col-md-2'>
             <?= $form->field($model, 'birth_city_id')->widget(Select2::class, [
                 'data' => ArrayHelper::map(City::find()->all(), 'id', 'name'),
                 'size' => Select2::MEDIUM,
@@ -60,7 +100,7 @@ use yii\widgets\ActiveForm;
             ]);
             ?>
         </div>
-        <div class='col-md-3'>
+        <div class='col-md-2'>
             <?= $form->field($model, 'birth_province_id')->widget(Select2::class, [
                 'data' => ArrayHelper::map(Province::find()->all(), 'id', 'name'),
                 'size' => Select2::MEDIUM,
@@ -71,10 +111,13 @@ use yii\widgets\ActiveForm;
             ]);
             ?>
         </div>
-        <div class='col-md-3'>
+        <div class='col-md-2'>
             <?= $form->field($model, 'birth_address')->textInput(['maxlength' => true]) ?>
         </div>
-        <div class='col-md-3'>
+        <div class='col-md-2'>
+            <?= $form->field($model, 'status')->dropDownList(RealContact::itemAlias('Status'), ['prompt' => Yii::t('app', 'Select Status')]) ?>
+        </div>
+        <div class='col-md-4'>
             <?= $form->field($model, 'registration_date')->widget(dateRangePicker::classname(), [
                 'options' => [
                     'locale' => [
@@ -128,7 +171,8 @@ use yii\widgets\ActiveForm;
                         ]); ?>
                         <div class="container-items">
                             <div>
-                                <button type="button" class="add-item-addresses btn  btn-xs float-right  bg-primary text-white">
+                                <button type="button"
+                                        class="add-item-addresses btn  btn-xs float-right  bg-primary text-white">
                                     آدرس جدید
                                 </button>
                             </div>
@@ -176,8 +220,9 @@ use yii\widgets\ActiveForm;
                                     </div>
                                     <div class="">
                                         <div class="">
-                                            <button type="button" class="remove-item-addresses btn  btn-xs float-right  btn-danger text-white">
-                                           حدف آدرس
+                                            <button type="button"
+                                                    class="remove-item-addresses btn  btn-xs float-right  btn-danger text-white">
+                                                حدف آدرس
                                             </button>
                                         </div>
                                         <div class="clearfix"></div>
@@ -212,7 +257,8 @@ use yii\widgets\ActiveForm;
                         ]); ?>
                         <div class="container-items">
                             <div>
-                                <button type="button" class="add-item-statistics btn  btn-xs float-right  bg-primary text-white">
+                                <button type="button"
+                                        class="add-item-statistics btn  btn-xs float-right  bg-primary text-white">
                                     شماره موبایل جدید
                                 </button>
                             </div>
@@ -241,7 +287,8 @@ use yii\widgets\ActiveForm;
                                     </div>
                                     <div class="">
                                         <div class="">
-                                            <button type="button" class="remove-item-statistics btn  btn-xs float-right  btn-danger text-white">
+                                            <button type="button"
+                                                    class="remove-item-statistics btn  btn-xs float-right  btn-danger text-white">
                                                 حذف شماره موبایل
                                             </button>
                                         </div>
@@ -276,7 +323,8 @@ use yii\widgets\ActiveForm;
                         ]); ?>
                         <div class="container-items">
                             <div>
-                                <button type="button" class="add-item-faxNumbers btn  btn-xs float-right  bg-primary text-white">
+                                <button type="button"
+                                        class="add-item-faxNumbers btn  btn-xs float-right  bg-primary text-white">
                                     شماره فکس جدید
                                 </button>
                             </div>
@@ -296,8 +344,9 @@ use yii\widgets\ActiveForm;
                                     </div>
                                     <div class="">
                                         <div class="">
-                                            <button type="button" class="remove-item-faxNumbers btn  btn-xs float-right  btn-danger text-white">
-                                            حذف شماره فکس
+                                            <button type="button"
+                                                    class="remove-item-faxNumbers btn  btn-xs float-right  btn-danger text-white">
+                                                حذف شماره فکس
                                             </button>
                                         </div>
                                         <div class="clearfix"></div>
@@ -331,8 +380,9 @@ use yii\widgets\ActiveForm;
                         ]); ?>
                         <div class="container-items">
                             <div>
-                                <button type="button" class="add-item-phoneNumbers btn  btn-xs float-right bg-primary text-white">
-                                   جدید شماره ثابت
+                                <button type="button"
+                                        class="add-item-phoneNumbers btn  btn-xs float-right bg-primary text-white">
+                                    جدید شماره ثابت
                                 </button>
                             </div>
                             <?php foreach ($phoneNumbers as $i => $number): ?>
@@ -351,7 +401,8 @@ use yii\widgets\ActiveForm;
                                     </div>
                                     <div class="">
                                         <div class="">
-                                            <button type="button" class="remove-item-phoneNumbers btn  btn-xs float-right btn-danger text-white">
+                                            <button type="button"
+                                                    class="remove-item-phoneNumbers btn  btn-xs float-right btn-danger text-white">
                                                 حذف شماره ثابت
                                             </button>
                                         </div>
@@ -386,7 +437,8 @@ use yii\widgets\ActiveForm;
                         ]); ?>
                         <div class="container-items">
                             <div>
-                                <button type="button" class="add-item-bankAccounts btn  btn-xs float-right  bg-primary text-white">
+                                <button type="button"
+                                        class="add-item-bankAccounts btn  btn-xs float-right  bg-primary text-white">
                                     شماره حساب جدید
                                 </button>
                             </div>
@@ -406,7 +458,8 @@ use yii\widgets\ActiveForm;
                                     </div>
                                     <div class="">
                                         <div class="">
-                                            <button type="button" class="remove-item-bankAccounts btn  btn-xs float-right  btn-danger text-white">
+                                            <button type="button"
+                                                    class="remove-item-bankAccounts btn  btn-xs float-right  btn-danger text-white">
                                                 حذف شماره حساب
                                             </button>
                                         </div>
@@ -441,7 +494,8 @@ use yii\widgets\ActiveForm;
                         ]); ?>
                         <div class="container-items">
                             <div>
-                                <button type="button" class="add-item-cards btn  btn-xs float-right  bg-primary text-white">
+                                <button type="button"
+                                        class="add-item-cards btn  btn-xs float-right  bg-primary text-white">
                                     شماره کارت جدید
                                 </button>
                             </div>
@@ -461,7 +515,8 @@ use yii\widgets\ActiveForm;
                                     </div>
                                     <div class="">
                                         <div class="">
-                                            <button type="button" class="remove-item-cards btn  btn-xs float-right  btn-danger text-white">
+                                            <button type="button"
+                                                    class="remove-item-cards btn  btn-xs float-right  btn-danger text-white">
                                                 حذف شماره کارت
                                             </button>
                                         </div>
@@ -497,7 +552,8 @@ use yii\widgets\ActiveForm;
                         ]); ?>
                         <div class="container-items">
                             <div>
-                                <button type="button" class="add-item-socialLink btn  btn-xs float-right  bg-primary text-white">
+                                <button type="button"
+                                        class="add-item-socialLink btn  btn-xs float-right  bg-primary text-white">
                                     شبکه اجتماعی جدید
                                 </button>
                             </div>
@@ -517,7 +573,8 @@ use yii\widgets\ActiveForm;
                                     </div>
                                     <div class="">
                                         <div class="">
-                                            <button type="button" class="remove-item-socialLink btn  btn-xs float-right  btn-danger text-white">
+                                            <button type="button"
+                                                    class="remove-item-socialLink btn  btn-xs float-right  btn-danger text-white">
                                                 حذف شبکه اجتماعی
                                             </button>
                                         </div>
@@ -553,7 +610,8 @@ use yii\widgets\ActiveForm;
                         ]); ?>
                         <div class="container-items">
                             <div>
-                                <button type="button" class="add-item-shabaNumbers btn  btn-xs float-right  bg-primary text-white">
+                                <button type="button"
+                                        class="add-item-shabaNumbers btn  btn-xs float-right  bg-primary text-white">
                                     شماره شبا جدید
                                 </button>
                             </div>
@@ -573,7 +631,8 @@ use yii\widgets\ActiveForm;
                                     </div>
                                     <div class="">
                                         <div class="">
-                                            <button type="button" class="remove-item-statistics btn  btn-xs float-right  btn-danger text-white">
+                                            <button type="button"
+                                                    class="remove-item-statistics btn  btn-xs float-right  btn-danger text-white">
                                                 حذف شماره شبا
                                             </button>
                                         </div>
@@ -609,7 +668,8 @@ use yii\widgets\ActiveForm;
                         ]); ?>
                         <div class="container-items">
                             <div>
-                                <button type="button" class="add-item-emails btn  btn-xs float-right  bg-primary text-white">
+                                <button type="button"
+                                        class="add-item-emails btn  btn-xs float-right  bg-primary text-white">
                                     ایمیل جدید
                                 </button>
                             </div>
@@ -629,7 +689,8 @@ use yii\widgets\ActiveForm;
                                     </div>
                                     <div class="">
                                         <div class="">
-                                            <button type="button" class="remove-item-emails btn  btn-xs float-right  btn-danger text-white">
+                                            <button type="button"
+                                                    class="remove-item-emails btn  btn-xs float-right  btn-danger text-white">
                                                 حذف ایمیل
                                             </button>
                                         </div>
@@ -665,7 +726,8 @@ use yii\widgets\ActiveForm;
                         ]); ?>
                         <div class="container-items">
                             <div>
-                                <button type="button" class="add-item-websites btn  btn-xs float-right  bg-primary text-white">
+                                <button type="button"
+                                        class="add-item-websites btn  btn-xs float-right  bg-primary text-white">
                                     آدرس جدید
                                 </button>
                             </div>
@@ -685,7 +747,8 @@ use yii\widgets\ActiveForm;
                                     </div>
                                     <div class="">
                                         <div class="">
-                                            <button type="button" class="remove-item-websites btn  btn-xs float-right  btn-danger text-white">
+                                            <button type="button"
+                                                    class="remove-item-websites btn  btn-xs float-right  btn-danger text-white">
                                                 حذف آدرس
                                             </button>
                                         </div>
@@ -700,113 +763,85 @@ use yii\widgets\ActiveForm;
             </div>
         </div>
         <div class='col-md-6'>
-            <div class="businesses-story-form">
-                <div class="row">
-                    <div class="card card-body">
+            <?php
+            DynamicFormWidget::begin([
+                'widgetContainer' => 'dynamicform_wrapper11',
+                'widgetBody' => '.container-items',
+                'widgetItem' => '.item-websites',
+                'limit' => 20,
+                'min' => 1,
+                'insertButton' => '.add-item-websites',
+                'deleteButton' => '.remove-item-websites',
+                'model' => $uploadFile[0],
+                'formId' => 'dynamic-form',
+                'formFields' => [
+                    'file_name',
+                    'file_path'
+                ],
+            ]); ?>
+            <div class="container-items">
+                <div>
+                    <button type="button" class="add-item-websites btn  btn-xs float-right  bg-primary text-white">
+                        فایل جدید
+                    </button>
+                </div>
+                <?php foreach ($uploadFile
+
+                               as $i => $file): ?>
+                <div class="item-websites panel panel-default" style="padding-right: 0px">
+                    <div class="panel-body">
                         <?php
-                        DynamicFormWidget::begin([
-                            'widgetContainer' => 'dynamicform_wrapper11',
-                            'widgetBody' => '.container-items',
-                            'widgetItem' => '.item-websites',
-                            'limit' => 20,
-                            'min' => 1,
-                            'insertButton' => '.add-item-websites',
-                            'deleteButton' => '.remove-item-websites',
-                            'model' => $uploadFile[0],
-                            'formId' => 'dynamic-form',
-                            'formFields' => [
-                                'file_name',
-                                'file_path'
-                            ],
-                        ]); ?>
-                        <div class="container-items">
-                            <div>
-                                <button type="button" class="add-item-websites btn  btn-xs float-right  bg-primary text-white">
-                                    فایل جدید
+                        if (!$file->isNewRecord) {
+                            echo Html::activeHiddenInput($file, "[{$i}]id");
+                        }
+                        ?>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <?= $form->field($file, "[{$i}]file_name")->textInput(['maxlength' => true]) ?>
+                                <div class="col-md-12 text-center">
+                                    <?= $form->field($file, "[{$i}]file_path")->widget(FileInput::class, [
+                                        'name' => 'attachment_3',
+                                        'options' => ['accept' => '*'],
+                                    ]) ?>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="">
+                            <div class="">
+                                <button type="button"
+                                        class="remove-item-websites btn  btn-xs float-right  btn-danger text-white">
+                                    حذف فایل
                                 </button>
                             </div>
-                            <?php foreach ($uploadFile as $i => $file): ?>
-                                <div class="item-websites panel panel-default" style="padding-right: 0px">
-                                    <div class="panel-body">
-                                        <?php
-                                        if (!$file->isNewRecord) {
-                                            echo Html::activeHiddenInput($file, "[{$i}]id");
-                                        }
-                                        ?>
-                                        <div class="row">
-                                            <div class="col-sm-12">
-                                                <?= $form->field($file, "[{$i}]file_name")->textInput(['maxlength' => true]) ?>
-                                                <div class="col-md-6 text-center">
-                                                    <?= $form->field($file, "[{$i}]file_path")->widget(FileInput::class, [
-                                                        'name' => 'attachment_3',
-                                                        'options' => ['accept' => '*'],
-                                                    ]) ?>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="">
-                                        <div class="">
-                                            <button type="button" class="remove-item-websites btn  btn-xs float-right  btn-danger text-white">
-                                                حذف فایل
-                                            </button>
-                                        </div>
-                                        <div class="clearfix"></div>
-                                    </div>
-                                </div>
-                            <?php endforeach; ?>
+                            <div class="clearfix"></div>
                         </div>
-                        <?php DynamicFormWidget::end(); ?>
                     </div>
+                    <?php endforeach; ?>
                 </div>
+                <?php DynamicFormWidget::end(); ?>
             </div>
         </div>
-        <div class='col-md-6'>
-
-            <?= $form->field($model, 'contact_tag')->widget(Select2::class, [
-                'initValueText' => $model->isNewRecord ? $tagSelected : ArrayHelper::map($searchedTags, 'tag_id', 'name'),
+        <div class="col-md-6 text-center">
+            <?=
+            $form->field($model, "image")->label(false)->widget(FileInput::class, [
                 'options' => [
-                    'multiple' => true,
-                    'placeholder' => 'یک یا چند تگ را انتخاب نمایید...',
-                    'dir' => 'rtl',
-                    'data-id' => $model->id,
-                    'data-tags' => $model->isNewRecord ? $tagSelected : ArrayHelper::map($searchedTags, 'tag_id', 'type'),
-                    'data-tags-name' => $model->isNewRecord ? $tagSelected : ArrayHelper::map($searchedTags, 'tag_id', 'name'),
-                    'data-tags-type' => Tag::itemAlias('TypeClass'),
-                    'class' => 'form-control TagInput',
+                    'multiple' => false,
+                    //'accept' => 'image/*',
                 ],
                 'pluginOptions' => [
-                    'allowClear' => true,
-                    'closeOnSelect' => false,
-                    'minimumInputLength' => 2,
-                    'ajax' => [
-                        'url' => Url::to(['/tag/list', 'type' => null]),
-                        'dataType' => 'json',
-                        'data' => new JsExpression('function(params) { return {query:params.term}; }'),
-                    ],
-                    'escapeMarkup' => new JsExpression('function (markup) { return markup; }'),
-                    'templateResult' => new JsExpression('function (data) { return (data.html != undefined) ? data.text : null; }'),
-                    'templateSelection' => new JsExpression('function (data)
-                    {
-                        var selectElement = $(data.element).parent();
-                        if(selectElement.data("tags")[data.id] != undefined){
-                            var type = selectElement.data("tags")[data.id];
-                            var typeClass = $(".TagInput").data("tags-type")[type];
-                            return "<span class=\"text-bold badge badge-" + typeClass + "\">" + data.text + "</span>";
-                        }else{
-                            return data.text;
-                        }
-                    }'),
+                    'showCaption' => false,
+                    'showRemove' => false,
+                    'showUpload' => false,
+                    'showCancel' => false,
+                    'theme' => 'explorer-fas',
+                    'browseClass' => 'btn btn-primary btn-sm btn-preview',
+                    'browseIcon' => '<i class="fas fa-file"></i> ',
+                    'browseLabel' => Yii::t('app', 'Choose a file ...'),
+                    'previewFileType' => 'image',
+                    'initialPreviewAsData' => true,
+                    'initialPreview' => (!$model->isNewRecord && $model->getUploadUrl("image")) ? $model->getUploadUrl("image") : false,
+                    'initialPreviewFileType' => 'image',
                 ]
-            ]); ?>
-        </div>
-        <div class='col-md-6 mt-5'>
-            <?= $form->field($model, 'status')->dropDownList(RealContact::itemAlias('Status'), ['prompt' => Yii::t('app', 'Select Status')]) ?>
-        </div>
-        <div class="col-md-6 text-center">
-            <?= $form->field($model, 'image')->widget(FileInput::class, [
-                'name' => 'attachment_3',
-                'options' => ['accept' => 'image/*'],
             ]) ?>
         </div>
     </div>

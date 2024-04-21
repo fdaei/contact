@@ -57,18 +57,35 @@ class Addresses extends Model
         return $headlinesJson;
     }
 
-    public static function loadDefaultValue($datas)
+    public static function loadDefaultValue($data)
     {
-        $arrayData = [];
-        for ($i = 0; $i < count($datas); $i++) {
-            $arrayData[$i] = new self();
-            $arrayData[$i]->attributes = $datas[$i];
+        $addressModels = [];
+
+        // Check if $data is a non-empty string (assuming it's a JSON string)
+        if (!empty($data) && is_string($data)) {
+            // Decode the JSON string into an array
+            $decodedData = json_decode($data, true);
+
+            // Check if decoding was successful
+            if (is_array($decodedData)) {
+                foreach ($decodedData as $addressData) {
+                    $addressModel = new self();
+                    $addressModel->attributes = $addressData;
+                    $addressModels[] = $addressModel;
+                }
+            } else {
+                // If decoding failed, initialize with a single empty address model
+                $addressModels[] = new self();
+            }
+        } else {
+            // If $data is empty or not a string, initialize with a single empty address model
+            $addressModels[] = new self();
         }
-        if(empty($arrayData)){
-            $arrayData = [new self()];
-        }
-        return $arrayData;
+
+        return $addressModels;
     }
+
+
 
     public static function itemAlias($type, $code = NULL)
     {
