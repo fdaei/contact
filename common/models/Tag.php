@@ -2,11 +2,8 @@
 
 namespace common\models;
 
-use common\behaviors\Jsonable;
-use common\helpers\CoreHelper;
+
 use Yii;
-use yii\behaviors\BlameableBehavior;
-use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 use yii\helpers\Json;
 use yii2tech\ar\softdelete\SoftDeleteBehavior;
@@ -16,7 +13,6 @@ use yii2tech\ar\softdelete\SoftDeleteBehavior;
  *
  * @property int $point_id
  * @property string $name
- * @property int $type
  * @property int $frequency
  * @property string $color
  * @property int $status
@@ -25,8 +21,6 @@ use yii2tech\ar\softdelete\SoftDeleteBehavior;
  */
 class Tag extends ActiveRecord
 {
-    const TYPE_RELATIONAL = 1;
-    const TYPE_LABEL = 2;
 
     const STATUS_ACTIVE = 1;
     const STATUS_DELETED = 0;
@@ -39,13 +33,12 @@ class Tag extends ActiveRecord
     public function rules()
     {
         return [
-            [['name', 'type'], 'required'],
+            [['name'], 'required'],
             [['frequency', 'status', 'deleted_at'], 'integer'],
-            ['type', 'in', 'range' => array_keys(self::itemAlias('Type'))],
             [['status'], 'in', 'range' => array_keys(self::itemAlias('Status'))],
             ['status', 'default', 'value' => self::STATUS_ACTIVE],
             ['deleted_at', 'default', 'value' => 0],
-            [['name', 'type', 'deleted_at'], 'unique', 'targetAttribute' => ['name', 'type', 'deleted_at'], 'message' => 'نوع و نام قبلا گرفته شده است!'],
+            [['name', 'deleted_at'], 'unique', 'targetAttribute' => ['name',  'deleted_at'], 'message' => '  نام قبلا گرفته شده است!'],
             ['name', 'string', 'max' => 64],
             ['color', 'string', 'max' => 7],
             ['additional_data','safe']
@@ -74,7 +67,7 @@ class Tag extends ActiveRecord
         return $this->hasMany(TagAssign::class, ['tag_id' => 'id']);
     }
 
-    public static function frequentlyTags($modelClass, $type)
+    public static function frequentlyTags($modelClass)
     {
         return self::find()
             ->select('name')
@@ -82,7 +75,6 @@ class Tag extends ActiveRecord
                 TagAssign::tableName(),
                 Tag::tableName() . '.tag_id=' . TagAssign::tableName() . '.tag_id'
             )->where('class=:class', [':class' => $modelClass])
-            ->andWhere('type=:type', [':type' => $type])
             ->groupBy(Tag::tableName() . '.tag_id')
             ->orderBy(['frequency' => 'DESC'])
             ->limit(15)
@@ -142,15 +134,6 @@ class Tag extends ActiveRecord
     public static function itemAlias($type, $code = NULL)
     {
         $_items = [
-            'Type' => [
-                self::TYPE_RELATIONAL => Yii::t("app", "Relational"),
-                self::TYPE_LABEL => Yii::t("app", "Label"),
-
-            ],
-            'TypeClass' => [
-                self::TYPE_RELATIONAL => 'info',
-                self::TYPE_LABEL => 'primary',
-            ],
             'Status' => [
                 self::STATUS_ACTIVE => Yii::t("app", "Active"),
                 self::STATUS_DELETED => Yii::t("app", "Deleted"),

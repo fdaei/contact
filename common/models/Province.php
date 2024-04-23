@@ -43,8 +43,8 @@ class Province extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
+            [['name', 'deleted_at'], 'unique', 'targetAttribute' => ['name', 'deleted_at']],
             [['name'], 'string', 'max' => 255],
-            [['name', 'deleted_at'], 'unique'],
             [['created_by'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['created_by' => 'id']],
             [['updated_by'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['updated_by' => 'id']],
         ];
@@ -94,6 +94,15 @@ class Province extends \yii\db\ActiveRecord
     public function getUpdatedBy()
     {
         return $this->hasOne(User::class, ['id' => 'updated_by']);
+    }
+
+    public function getReal()
+    {
+        return $this->hasOne(Province::class, ['registration_province_id' => 'id']);
+    }
+    public function getLegal()
+    {
+        return $this->hasOne(Province::class, ['birth_province_id' => 'id']);
     }
 
     /**

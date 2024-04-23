@@ -4,16 +4,20 @@ namespace backend\controllers;
 
 use common\models\Province;
 use common\models\ProvinceSearch;
+use common\traits\AjaxValidationTrait;
+use yii\db\Exception;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use Yii;
+use yii\web\Response;
 
 /**
  * ProvinceController implements the CRUD actions for Province model.
  */
 class ProvinceController extends Controller
 {
+    use AjaxValidationTrait;
     /**
      * @inheritDoc
      */
@@ -57,15 +61,30 @@ class ProvinceController extends Controller
     {
         $model = new Province();
 
-        if ($this->request->isPost) {
-            if ($model->load($this->request->post()) && $model->save()) {
-                return $this->redirect(['index']);
+        if ($model->load(Yii::$app->request->post()) && $model->validate()) {
+
+            $transaction = Yii::$app->db->beginTransaction();
+            try {
+
+                if ($model->save(false)) {
+                    $transaction->commit();
+                    Yii::$app->response->format = Response::FORMAT_JSON;
+                    return [
+                        'status' => 'success',
+                        'success' => true,
+                        'msg' => Yii::t("app", "success")
+                    ];
+                } else {
+                    $transaction->rollBack();
+                }
+            } catch (Exception $e) {
+                $transaction->rollBack();
             }
-        } else {
-            $model->loadDefaultValues();
         }
 
-        return $this->render('create', [
+        $this->performAjaxValidation($model);
+
+        return $this->renderAjax('create', [
             'model' => $model,
         ]);
     }
@@ -81,11 +100,28 @@ class ProvinceController extends Controller
     {
         $model = $this->findModel($id);
 
-        if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
-            return $this->redirect(['index']);
-        }
+        if ($model->load(Yii::$app->request->post()) && $model->validate()) {
+            $transaction = Yii::$app->db->beginTransaction();
+            try {
+                $flag = $model->save(false);
 
-        return $this->render('update', [
+                if ($flag) {
+                    $transaction->commit();
+                    Yii::$app->response->format = Response::FORMAT_JSON;
+                    return [
+                        'success' => true,
+                        'msg' => Yii::t("app", "Success")
+                    ];
+                } else {
+                    $transaction->rollBack();
+                }
+            } catch (Exception $e) {
+                $transaction->rollBack();
+            }
+        }
+        $this->performAjaxValidation($model);
+
+        return $this->renderAjax('update', [
             'model' => $model,
         ]);
     }
@@ -100,14 +136,28 @@ class ProvinceController extends Controller
     public function actionDelete($id)
     {
         $model = $this->findModel($id);
+        $result = ['status' => true];
 
-        if ($model->canDelete() && $model->softDelete()) {
-            $this->flash('success', Yii::t('app', 'Item Deleted'));
+        if ($model->getReal() || $model->getLegal()) {
+            $result = [
+                'status' => false,
+                'message' => Yii::t("app", "امکان حذف وجود ندارد.")
+            ];
         } else {
-            $this->flash('error', $model->errors ? array_values($model->errors)[0][0] : Yii::t('app', 'Error In Delete Action'));
+            if ($model->softDelete()) {
+                $result = [
+                    'status' => true,
+                    'message' => Yii::t("app", "Item Deleted")
+                ];
+            } else {
+                $result = [
+                    'status' => false,
+                    'message' => Yii::t("app", "Error In Save Info")
+                ];
+            }
         }
-
-        return $this->redirect(['index']);
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        return $result;
     }
     /**
      * Finds the Province model based on its primary key value.

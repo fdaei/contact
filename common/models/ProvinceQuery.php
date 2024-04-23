@@ -33,6 +33,6 @@ class ProvinceQuery extends \yii\db\ActiveQuery
      */
     public function active()
     {
-        return $this;
+        return $this->onCondition([Province::tableName() . '.deleted_at' => '0']);
     }
 }

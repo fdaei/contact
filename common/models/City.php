@@ -58,6 +58,7 @@ class City extends \yii\db\ActiveRecord
     {
         return [
             'id' => Yii::t('app', 'ID'),
+            'name'=> Yii::t('app', 'Name'),
             'province_id' => Yii::t('app', 'Province ID'),
             'created_at' => Yii::t('app', 'Created At'),
             'created_by' => Yii::t('app', 'Created By'),
@@ -87,6 +88,14 @@ class City extends \yii\db\ActiveRecord
         return $this->hasOne(Province::class, ['id' => 'province_id']);
     }
 
+    public function getReal()
+    {
+        return $this->hasOne(Province::class, ['registration_city_id' => 'id']);
+    }
+    public function getLegal()
+    {
+        return $this->hasOne(Province::class, ['birth_city_id' => 'id']);
+    }
 
 
     /**

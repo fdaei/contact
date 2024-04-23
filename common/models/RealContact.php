@@ -76,9 +76,6 @@ class RealContact extends ActiveRecord
     {
         if (parent::beforeValidate()) {
             $this->registration_date = strtotime(str_replace('/', '-', $this->registration_date));
-            return true;
-        } else {
-            return false;
         }
     }
 

@@ -339,4 +339,6 @@ return [
     'File Name'=>'اسم فایل',
     'File Path'=>'آپلود فایل',
     'Contact Tag'=>'تگ',
+    'Active'=>'فعال',
+    'Deleted'=>'حذف شده',
 ];

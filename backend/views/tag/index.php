@@ -22,7 +22,7 @@ $this->params['breadcrumbs'][] = $this->title;
             <?= Html::a(Yii::t('app', 'create tag'), "javascript:void(0)",
                 [
                     'data-pjax' => '0',
-                    'class' => "btn btn-outline-primary float-right mx-1",
+                    'class' => "btn btn-success text-left",
                     'data-size' => 'modal-xl',
                     'data-title' => Yii::t('app', 'create'),
                     'data-toggle' => 'modal',
@@ -42,13 +42,6 @@ $this->params['breadcrumbs'][] = $this->title;
             'dataProvider' => $dataProvider,
             'columns' => [
                 ['class' => 'yii\grid\SerialColumn'],
-                [
-                    'attribute' => 'type',
-                    'value' => function ($model) {
-
-                        return Tag::itemAlias('Type',$model->type);
-                    },
-                ],
                 'name',
                 'frequency',
                 [
@@ -63,10 +56,9 @@ $this->params['breadcrumbs'][] = $this->title;
                     'template' => ' {update} {delete} ',
                     'buttons' => [
                         'update' => function ($url, $model, $key) {
-                            return Html::a(Yii::t('app', 'Update'), "javascript:void(0)",
+                            return Html::a(Yii::t('app', '<span class="fa fa-pencil text-info"></span>'), "javascript:void(0)",
                                 [
                                     'data-pjax' => '0',
-                                    'class' => "btn btn-outline-info mx-1",
                                     'data-size' => 'modal-xl',
                                     'data-title' => Yii::t('app', 'Update'),
                                     'data-toggle' => 'modal',
@@ -80,14 +72,13 @@ $this->params['breadcrumbs'][] = $this->title;
                             );
                         },
                         'delete' => function ($url, $model, $key) {
-                            return Html::a(Html::tag('span', Yii::t('app', 'Delete'), ['class' => "btn btn-outline-danger ml-1 rounded-3"]), 'javascript:void(0)',
+                            return Html::a(Html::tag('span', Yii::t('app', '<span class="fa fa-trash text-danger"></span>')), 'javascript:void(0)',
                                 [
                                     'title' => Yii::t('yii', 'delete'),
                                     'aria-label' => Yii::t('yii', 'delete'),
                                     'data-reload-pjax-container' => 'p-jax-tag-form',
                                     'data-pjax' => '0',
                                     'data-url' => Url::to(['/tag/delete', 'id' => $model->tag_id]),
-                                    'class' => " p-jax-btn",
                                     'data-title' => Yii::t('yii', 'delete'),
                                     'data-toggle' => 'tooltip',
                                 ]

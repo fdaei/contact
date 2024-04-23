@@ -11,7 +11,7 @@ class CityQuery extends \yii\db\ActiveQuery
 {
     public function active()
     {
-        return $this;
+        return $this->onCondition([City::tableName() . '.deleted_at' => '0']);
     }
 
     /**

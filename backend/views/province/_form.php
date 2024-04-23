@@ -12,21 +12,15 @@ use yii\widgets\ActiveForm;
 /** @var Province $model */
 /** @var ActiveForm $form */
 ?>
-
 <div class="card">
-    <?php $form = ActiveForm::begin(); ?>
-    <div class="card-body">
-        <div class="row justify-content-center">
-            <div class="col-sm-8">
-                <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
-            </div>
-        </div>
-        <div class="form-group mb-0 card-footer d-flex justify-content-between">
-            <div class="col-md-10 d-flex justify-content-end">
-                <?= Html::submitButton(Yii::t('app', 'Save'), ['class' => 'btn btn-info btn-rounded']) ?>
-            </div>
-        </div>
-        <?php ActiveForm::end(); ?>
-
+    <?php $form = ActiveForm::begin(['id'=>'province-form']); ?>
+    <div class="col-sm-12">
+        <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
     </div>
+    <div class="text-right">
+        <?= Html::submitButton(Yii::t('app', 'Save'), ['class' => 'btn btn-success']) ?>
+    </div>
+    <?php ActiveForm::end(); ?>
+
 </div>
+

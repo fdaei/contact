@@ -16,7 +16,6 @@ class m230625_083705_create_table_ince_tags extends Migration
             [
                 'tag_id' => $this->primaryKey(),
                 'name' => $this->string(128)->notNull(),
-                'type' => $this->tinyInteger()->notNull(),
                 'frequency' => $this->integer()->defaultValue('0'),
                 'color' => $this->string(10),
                 'status' => $this->tinyInteger()->notNull()->defaultValue('1'),
@@ -26,13 +25,13 @@ class m230625_083705_create_table_ince_tags extends Migration
         );
 
         $this->createIndex('fulltext_name', '{{%tags}}', ['name']);
-        $this->createIndex('unique_name_type_deleted_at', '{{%tags}}', ['name', 'type', 'deleted_at'], true);
+        $this->createIndex('unique_name_deleted_at', '{{%tags}}', ['name', 'deleted_at'], true);
     }
 
     public function safeDown()
     {
         $this->dropIndex('fulltext_name', '{{%tags}}');
-        $this->dropIndex('unique_name_type_deleted_at', '{{%tags}}');
+        $this->dropIndex('unique_name_deleted_at', '{{%tags}}');
         $this->dropTable('{{%tags}}');
     }
 

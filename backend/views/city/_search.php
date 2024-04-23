@@ -32,14 +32,14 @@ use yii\widgets\ActiveForm;
             ]);
             ?>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-3 mt-4">
             <?= $form->field($model, 'name') ?>
 
         </div>
     </div>
     <div class="form-group">
-        <?= Html::submitButton(Yii::t('app', 'Search'), ['class' => 'btn btn-info btn-rounded']) ?>
-        <?= Html::resetButton(Yii::t('app', 'Reset'), ['class' => 'btn btn-outline-info btn-rounded']) ?>
+        <?= Html::submitButton(Yii::t('app', 'Search'), ['class' => 'btn btn-primary']) ?>
+        <?= Html::resetButton( Yii::t('app', 'Reset'), ['class' => 'btn btn-outline-secondary']) ?>
     </div>
 
     <?php ActiveForm::end(); ?>
